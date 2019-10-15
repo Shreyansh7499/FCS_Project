@@ -3,6 +3,8 @@ from .models import Post
 from django.contrib.auth.decorators import login_required
 from django.forms import ModelForm
 from django.shortcuts import redirect
+from django.core.exceptions import PermissionDenied
+
 
 class create_post_form(ModelForm):
     class Meta:
@@ -32,7 +34,26 @@ def create_post(request):
         form = create_post_form()
     return render(request, 'Wall/create_post.html', {'form': form})
 
+
 @login_required
-def delete_post(request,id):
-	post = get_object_or_404(Post,id=id)
-	
+def update_post(request,id):
+    if request.method == 'POST':
+        form = create_post_form(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect('Wall-home')
+    else:
+        form = create_post_form()
+    return render(request, 'Wall/create_post.html', {'form': form})
+
+# @login_required
+# def delete_post(request,id):
+#     post = get_object_or_404(Post,id=id)
+#     if request.user == post.user:
+#         post.delete()
+#         return redirect('Wall-home')
+#     else:
+#         raise PermissionDenied
+#         return redirect('Wall-home')

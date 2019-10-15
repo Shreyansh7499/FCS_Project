@@ -5,6 +5,7 @@
 		<a href="{% url 'logout' %}">Logout</a>
 		<a href="{% url 'profile' %}">Profile</a>
 		<a href="{% url 'Wall-create-post' %}">Create Post</a>
+
     	{% for post in posts %}
 			<div>
 				<h1>{{post.pk}}</h1>
