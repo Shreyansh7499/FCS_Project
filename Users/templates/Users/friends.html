@@ -3,20 +3,52 @@
 	<h1>People</h1>
 	{% if user.is_authenticated %}
 		<a href="{% url 'logout' %}">Logout</a>
-		<a href="{% url 'profile' %}">Profile</a>
+		<a href="{% url 'profile' user.username %}">Profile</a>
 		<h1>My Friends</h1>		
     	{% for friend in friends %}
 			<div>
-				<h2>{{friend.username}}</h2>
+				<a href="{% url 'profile' friend.username %}">
+					<h2>
+						{{friend.username}}
+					</h2>
+				</a>
 				<a href="{% url 'remove_friend' pk=friend.pk %}"> 
 					<button type="button" class="btn btn-primary">Remove Friend</button>
 				</a>
 			</div>
 		{% endfor%}
-		<h1>All Users</h1>	
-    	{% for user in users %}
+		<h1>Friend Request Received</h1>	
+    	{% for user in friend_requests_received %}
 			<div>
-				<h2>{{user.username}}</h2>
+				<a href="{% url 'profile' user.username %}">
+					<h2>
+						{{user.username}}
+					</h2>
+				</a>
+				<a href="{% url 'add_friend' pk=user.pk %}"> 
+					<button type="button" class="btn btn-primary">Add Friend</button>
+				</a>
+			</div>
+		{% endfor%}	
+		<h1>Friend Requests Sent</h1>	
+    	{% for user in friend_requests_sent %}
+			<div>
+				<a href="{% url 'profile' user.username %}">
+					<h2>
+						{{user.username}}
+					</h2>
+				</a>
+				<p>Request Pending</p>
+			</div>
+		{% endfor%}
+		<h1>Other Users</h1>	
+    	{% for user in other_users %}
+			<div>
+				<a href="{% url 'profile' user.username %}">
+					<h2>
+						{{user.username}}
+					</h2>
+				</a>
 				<a href="{% url 'add_friend' pk=user.pk %}"> 
 					<button type="button" class="btn btn-primary">Add Friend</button>
 				</a>

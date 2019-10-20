@@ -22,7 +22,7 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('Wall/', include('Wall.urls')),
 	path('register/',user_view.register,name="register"),
-    path('profile/',user_view.profile,name="profile"),
+    path('profile/(?P<username>.+)/',user_view.profile,name="profile"),
     path('friends/',user_view.friend_page,name="friend_page"),
 	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html'), name='login'),
 	path('logout/', auth_view.LogoutView.as_view(template_name='Users/logout.html'), name='logout'),

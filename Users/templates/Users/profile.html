@@ -1,11 +1,11 @@
 {% extends "Wall/base.html" %}
 {% block content %}
-	{% if user.is_authenticated %}
+	{% if user.username == profile_username %}
 		<a href="{% url 'logout' %}">Logout</a>
-    	<p>{{user.username}}</p>
+    	<p>{{profile_username}}</p>
     	<a href="{% url 'Wall-home' %}">Home</a>
 	{% else %}
-		<p>You need to login first</p>
-		<a href="{% url 'login' %}">Log In</a>
+		<p>{{profile_username}}</p>
+		<a href="{% url 'Wall-home' %}">Back Home</a>
 	{% endif %}    
 {% endblock content %}

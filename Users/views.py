@@ -23,23 +23,58 @@ def register(request):
     return render(request, 'Users/register.html', {'form': form})
 
 @login_required
-def profile(request):
-    return render(request,'Users/profile.html')
+def profile(request,username):
+    print(username)
+    user = User.objects.get(username=username)
+
+
+    # all data for profile is sent through here
+    return render(request,'Users/profile.html',{'profile_username':user.username})
 
 
 @login_required
 def friend_page(request):
     if request.user.is_authenticated:
         all_users = User.objects.exclude(id=request.user.id)
-        try:
-            friend = Friend.objects.get(current_user = request.user)
-            friends = friend.users.all() 
-        except Friend.DoesNotExist:
-            friends = None
-        data = {'users':all_users,'friends':friends}   
+        user_friends = get_one_sided_friends(request.user)
+
+        all_users_usernames = get_usernames(all_users)
+        user_friends_usernames = get_usernames(user_friends)
+        friend_requests_received = []
+        friend_requests_sent = []
+        friends = []
+        other_users = []
+        for i in all_users:
+            i_friends = get_one_sided_friends(i)
+            if request.user in i_friends:
+                if i in user_friends:
+                    friends.append(i)
+                else:
+                    friend_requests_received.append(i)
+            else:
+                if i in user_friends:
+                    friend_requests_sent.append(i)
+                else:
+                    other_users.append(i)
+
+        data = {'other_users':other_users,'friends':friends,'friend_requests_sent':friend_requests_sent,'friend_requests_received':friend_requests_received}   
         return render(request, 'Users/friends.html',data)
     return render(request, 'Wall/home.html')
 
+
+def get_one_sided_friends(user):
+    try:
+        friend = Friend.objects.get(current_user = user)
+        friends = friend.users.all() 
+    except Friend.DoesNotExist:
+        friends = None
+    return friends
+
+def get_usernames(users):
+    ret = []
+    for i in users:
+        ret.append(i)
+    return ret
 
 @login_required
 def add_friend(request,pk):
