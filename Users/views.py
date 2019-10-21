@@ -24,10 +24,7 @@ def register(request):
 
 @login_required
 def profile(request,username):
-    print(username)
     user = User.objects.get(username=username)
-
-
     # all data for profile is sent through here
     return render(request,'Users/profile.html',{'profile_username':user.username})
 
@@ -35,32 +32,33 @@ def profile(request,username):
 @login_required
 def friend_page(request):
     if request.user.is_authenticated:
-        all_users = User.objects.exclude(id=request.user.id)
-        user_friends = get_one_sided_friends(request.user)
-
-        all_users_usernames = get_usernames(all_users)
-        user_friends_usernames = get_usernames(user_friends)
-        friend_requests_received = []
-        friend_requests_sent = []
-        friends = []
-        other_users = []
-        for i in all_users:
-            i_friends = get_one_sided_friends(i)
-            if request.user in i_friends:
-                if i in user_friends:
-                    friends.append(i)
-                else:
-                    friend_requests_received.append(i)
-            else:
-                if i in user_friends:
-                    friend_requests_sent.append(i)
-                else:
-                    other_users.append(i)
-
-        data = {'other_users':other_users,'friends':friends,'friend_requests_sent':friend_requests_sent,'friend_requests_received':friend_requests_received}   
+        data = get_friends_matrix(request.user)
         return render(request, 'Users/friends.html',data)
     return render(request, 'Wall/home.html')
 
+
+def get_friends_matrix(user):
+    user_friends = get_one_sided_friends(user)
+    all_users = User.objects.exclude(id=user.id)
+    friend_requests_received = []
+    friend_requests_sent = []
+    friends = []
+    other_users = []
+    for i in all_users:
+        i_friends = get_one_sided_friends(i)
+        if user in i_friends:
+            if i in user_friends:
+                friends.append(i)
+            else:
+                friend_requests_received.append(i)
+        else:
+            if i in user_friends:
+                friend_requests_sent.append(i)
+            else:
+                other_users.append(i)
+
+    data = {'other_users':other_users,'friends':friends,'friend_requests_sent':friend_requests_sent,'friend_requests_received':friend_requests_received}
+    return data
 
 def get_one_sided_friends(user):
     try:

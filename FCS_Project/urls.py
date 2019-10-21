@@ -17,11 +17,15 @@ from django.contrib import admin
 from django.urls import path,include
 from Users import views as user_view
 from django.contrib.auth import views as auth_view
-
+from Messages import views as messages_view
+from Messages.views import Message_Create
 urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('Wall/', include('Wall.urls')),
-	path('register/',user_view.register,name="register"),
+    path('messages/', messages_view.message_view, name='messages_view'),
+    path('create_message/', Message_Create.as_view(), name='message_create'),
+    path('chat/(?P<username>.+)/',messages_view.chat,name="chat"),
+    path('register/',user_view.register,name="register"),
     path('profile/(?P<username>.+)/',user_view.profile,name="profile"),
     path('friends/',user_view.friend_page,name="friend_page"),
 	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html'), name='login'),

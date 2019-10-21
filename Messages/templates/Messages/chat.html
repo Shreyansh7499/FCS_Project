@@ -1,22 +1,24 @@
 {% extends "Wall/base.html" %}
 {% block content %}
-	<h1>Home Page</h1>
+	<h1>Messages</h1>
 	{% if user.is_authenticated %}
 		<a href="{% url 'logout' %}">Logout</a>
 		<a href="{% url 'profile' user.username %}">Profile</a>
 		<a href="{% url 'Wall-create-post' %}">Create Post</a>
 		<a href="{% url 'friend_page' %}">Friends</a>
 		<a href="{% url 'messages_view' %}">Messages</a>
-    	{% for post in posts %}
+    	<h1>My Chat</h1>		
+    	{% for message in messages %}
 			<div>
-				<h1>{{post.pk}}</h1>
-				<h1>{{post.author}}</h1>
-				<h2>{{post.date_posted|date:"F d, Y"}}</h2>  
-				<h2>{{post.title}}</h2>
-				<h2>{{post.content}}</h2>
+				<h2>{{message.sender.username}}</h2>
+				<h2>{{message.receiver.username}}</h2>
+				<h2>{{message.message}}</h2>
+				<h2>{{message.date_posted}}</h2>
 			</div>
 		{% endfor%}
-			
+		<a href="{% url 'message_create' %}"> 
+			<button type="button" class="btn btn-primary">Send Message</button>
+		</a>
 	{% else %}
 		<a href="{% url 'login' %}">Log In</a>
 	{% endif %}

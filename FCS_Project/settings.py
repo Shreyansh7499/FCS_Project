@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'Users.apps.UsersConfig',
     'Wall.apps.WallConfig',
+    'Messages.apps.MessagesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
