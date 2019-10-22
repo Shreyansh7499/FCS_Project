@@ -1,0 +1,27 @@
+{% extends "Wall/base.html" %}
+{% block content %}
+	<h1>Groups</h1>
+	{% if user.is_authenticated %}
+		<a href="{% url 'logout' %}">Logout</a>
+		<a href="{% url 'profile' user.username %}">Profile</a>
+		<a href="{% url 'Wall-create-post' %}">Create Post</a>
+		<a href="{% url 'friend_page' %}">Friends</a>
+		<a href="{% url 'Wall-home' %}">Home</a>
+		<a href="{% url 'group_create' %}">Create Group</a>
+
+    	<h1>All Groups</h1>
+    	{% for group in groups %}
+			<div>
+				<a href="{% url 'mygroup' group.group_name %}">
+					<h2>
+						{{group.group_name}}
+					</h2>
+				</a>
+				<h2>{{group.description}}</h2>
+			</div>
+		{% endfor%}
+	{% else %}
+		<a href="{% url 'login' %}">Log In</a>
+	{% endif %}
+    
+{% endblock content %}

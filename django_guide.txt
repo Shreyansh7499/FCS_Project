@@ -10,3 +10,6 @@ python manage.py migrate - set up new tables after prev cmd
 References:
 
 https://docs.djangoproject.com/en/2.2/topics/class-based-views/generic-editing/ for create,update,delete
+
+make every user which is not autheticated
+    return redirect('login')

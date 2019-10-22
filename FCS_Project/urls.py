@@ -18,11 +18,17 @@ from django.urls import path,include
 from Users import views as user_view
 from django.contrib.auth import views as auth_view
 from Messages import views as messages_view
+from Groups import views as group_view
 from Messages.views import Message_Create
+from Groups.views import Group_Create,Group_Post_Create
 urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('Wall/', include('Wall.urls')),
     path('messages/', messages_view.message_view, name='messages_view'),
+    path('groups/', group_view.group_home, name='group_home'),
+    path('create_group/', Group_Create.as_view(), name='group_create'),
+    path('create_group_post/', Group_Post_Create.as_view(), name='group_post_create'),
+    path('mygroup/(?P<group_name>.+)/',group_view.mygroup,name="mygroup"),
     path('create_message/', Message_Create.as_view(), name='message_create'),
     path('chat/(?P<username>.+)/',messages_view.chat,name="chat"),
     path('register/',user_view.register,name="register"),
