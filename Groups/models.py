@@ -9,7 +9,7 @@ class Group(models.Model):
     description = models.TextField(max_length=100,null=True,blank=True)
     date_posted = models.DateTimeField(default=timezone.now,null=True,blank=True)
     group_name = models.TextField(max_length=100,unique=True)
-    members = models.ManyToManyField(User,null=True,blank=True)
+    members = models.ManyToManyField(User)
     
     def __str__(self):
         return str(self.group_name +" by: " + self.owner.username)

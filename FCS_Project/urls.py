@@ -19,9 +19,10 @@ from Users import views as user_view
 from django.contrib.auth import views as auth_view
 from Messages import views as messages_view
 from Groups import views as group_view
+from Wallet import views as wallet_view
 from Messages.views import Message_Create
 from Groups.views import Group_Create,Group_Post_Create,Group_Join_request_Create
-
+from Wallet.views import Wallet_Create,Transaction_Create,Add_Money_Transaction_Create
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
@@ -39,7 +40,12 @@ urlpatterns = [
     path('add_group_member/(?P<group_name>.+)/(?P<pk>\d+)/',group_view.add_group_member,name="add_group_member"),
     path('remove_group_member/(?P<group_name>.+)/(?P<pk>\d+)/',group_view.remove_group_member,name="remove_group_member"),
 
-    
+    path('wallet/', wallet_view.wallet_home, name='wallet_home'),
+    path('create_wallet/', Wallet_Create.as_view(), name='wallet_create'),
+    path('create_transaction/', Transaction_Create.as_view(), name='transaction_create'),
+    path('create_add_money_transaction/', Add_Money_Transaction_Create.as_view(), name='add_money_transaction_create'),
+    path('accept_transaction/(?P<pk>\d+)/', wallet_view.accept_transaction, name='accept_transaction'),
+
     path('register/',user_view.register,name="register"),
     path('profile/(?P<username>.+)/',user_view.profile,name="profile"),
 	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html'), name='login'),

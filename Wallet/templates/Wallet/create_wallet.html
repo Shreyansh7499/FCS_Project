@@ -1,0 +1,21 @@
+{% extends "Wall/base.html" %}
+{% block content %}
+    <div>
+        <h2>It appears that you do not have a Wallet</h2>
+        <h2>Click submit to create your wallet</h2>
+        <a href="{% url 'logout' %}">Logout</a>
+        <a href="{% url 'profile' user.username %}">Profile</a>
+        <a href="{% url 'messages_view' %}">Messages</a>
+        <a href="{% url 'Wall-home' %}">Home</a> 
+        <form method="POST">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend>Create Message</legend>
+                {{ form }}
+            </fieldset>
+            <div class="form-group">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}
