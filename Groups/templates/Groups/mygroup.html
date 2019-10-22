@@ -9,6 +9,25 @@
 		<a href="{% url 'Wall-home' %}">Home</a>
 		<a href="{% url 'group_home' %}">All Group</a>
 		<a href="{% url 'group_post_create' %}">Create Group Post</a>
+    	<h1>Members</h1>
+    	{% for member in members %}
+			<div>
+				<h2>{{member.username}}</h2>
+				<a href="{% url 'remove_group_member' group_name=group_name pk=member.pk %}"> 
+					<button type="button" class="btn btn-primary">remove user from Group</button>
+				</a>
+			</div>
+		{% endfor%}
+    	<h1>Group Requests</h1>
+    	{% for member_request in member_requests %}
+			<div>
+				<h2>{{member_request.user_requesting.username}}</h2>
+				<a href="{% url 'add_group_member' group_name=member_request.group.group_name pk=member_request.user_requesting.pk %}"> 
+					<button type="button" class="btn btn-primary">Add user to Group</button>
+				</a>
+			</div>
+		{% endfor%}
+
     	<h1>Group Posts</h1>
     	{% for group_post in group_posts %}
 			<div>

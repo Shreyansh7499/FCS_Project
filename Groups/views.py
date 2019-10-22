@@ -51,9 +51,11 @@ def create_group(request):
 @login_required
 def mygroup(request,group_name):
     group = Group.objects.filter(group_name=group_name)[0]
-    if request.user in group.members.all():
+    requests = Group_join_request.objects.filter(group=group).order_by('-date_posted')
+    members = group.members.all()
+    if request.user in group.members.all() or request.user == group.owner:
         group_posts = Group_post.objects.filter(group=group).order_by('-date_posted')
-        return render(request,'Groups/mygroup.html',{'group_posts':group_posts})
+        return render(request,'Groups/mygroup.html',{'group_posts':group_posts,'members':members,'member_requests':requests,'group_name':group.group_name})
     else:
         return redirect('group_home')
 
@@ -86,3 +88,47 @@ def create_group_post(request):
     else:
         form = create_post_form()
     return render(request, 'Group/create_group_post.html', {'form': form})
+
+
+class Group_Join_request_Create(LoginRequiredMixin,CreateView):
+    model = Group_join_request
+    fields = ['group']
+    template_name = 'Groups/create_group_join_request.html'
+    context_object_name = 'group_join_request'
+
+    def form_valid(self,form):
+        form.instance.user_requesting = self.request.user
+        if Group_join_request.objects.filter(group=form.instance.group,user_requesting=self.request.user).count() >= 1:
+            return redirect('group_home')
+        else:
+            return super().form_valid(form)
+
+@login_required
+def group_join_request(request):
+    if request.method == 'POST':
+        form = create_post_form(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.user_requesting = request.user
+            post.save()
+            return redirect('group_home')
+    else:
+        form = create_post_form()
+    return render(request, 'Group/create_group_join_request.html', {'form': form})
+
+
+@login_required
+def add_group_member(request,group_name,pk):
+    group = Group.objects.get(group_name = group_name)
+    new_member = User.objects.get(pk=pk)
+    if request.user == group.owner:
+        Group.add_member(group_name,new_member)    
+    return redirect('group_home')
+
+@login_required
+def remove_group_member(request,group_name,pk):
+    group = Group.objects.get(group_name = group_name)
+    new_member = User.objects.get(pk=pk)
+    if request.user == group.owner:
+        Group.remove_member(group_name,new_member)    
+    return redirect('group_home')
