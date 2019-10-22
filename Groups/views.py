@@ -70,7 +70,7 @@ class Group_Post_Create(LoginRequiredMixin,CreateView):
         form.instance.sender = self.request.user
         group = form.instance.group
         members = group.members.all()
-        if self.request.user in members:
+        if self.request.user in members or self.request.user == group.owner:
             return super().form_valid(form)
         else:
             return redirect('group_home')
