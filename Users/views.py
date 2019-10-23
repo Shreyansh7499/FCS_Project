@@ -46,13 +46,14 @@ def get_friends_matrix(user):
     other_users = []
     for i in all_users:
         i_friends = get_one_sided_friends(i)
-        if user in i_friends:
-            if i in user_friends:
+
+        if i_friends and user in i_friends:
+            if user_friends and i in user_friends:
                 friends.append(i)
             else:
                 friend_requests_received.append(i)
         else:
-            if i in user_friends:
+            if user_friends and i in user_friends:
                 friend_requests_sent.append(i)
             else:
                 other_users.append(i)

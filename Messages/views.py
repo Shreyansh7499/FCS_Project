@@ -21,25 +21,11 @@ class Message_Create(LoginRequiredMixin,CreateView):
         form.instance.sender = self.request.user
         data = get_friends_matrix(self.request.user)
         friend = form.instance.receiver
-        print(friend)
         if friend in data['friends']:
             return super().form_valid(form)
         else:
             return redirect('messages_view')
 
-@login_required
-def create_message(request):
-    if request.method == 'POST':
-        form = create_post_form(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.sender = request.user
-            print("Cdcf")
-            post.save()
-            return redirect('messages_view')
-    else:
-        form = create_post_form()
-    return render(request, 'Message/create_post.html', {'form': form})
 
 def message_view(request):
 	if request.user.is_authenticated:

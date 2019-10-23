@@ -18,8 +18,8 @@ class Group(models.Model):
         return reverse('group_home')
 
     def form_valid(self, form):
-    	form.instance.created_by = self.request.user
-    	return super().form_valid(form)
+        form.instance.created_by = self.request.user
+        return super().form_valid(form)
 
     @classmethod            
     def add_member(cls,group_name,new_member):

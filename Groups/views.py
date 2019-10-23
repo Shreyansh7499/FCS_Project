@@ -36,26 +36,14 @@ class Group_Create(LoginRequiredMixin,CreateView):
 
 
 @login_required
-def create_group(request):
-    if request.method == 'POST':
-        form = create_post_form(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.sender = request.user
-            post.save()
-            return redirect('group_home')
-    else:
-        form = create_post_form()
-    return render(request, 'Group/create_group.html', {'form': form})
-
-@login_required
 def mygroup(request,group_name):
     group = Group.objects.filter(group_name=group_name)[0]
-    requests = Group_join_request.objects.filter(group=group).order_by('-date_posted')
+    requests = Group_join_request.objects.filter(group=group).exclude(user_requesting=group.owner).order_by('-date_posted')
     members = group.members.all()
+    # members = members.union(group.owner)
     if request.user in group.members.all() or request.user == group.owner:
         group_posts = Group_post.objects.filter(group=group).order_by('-date_posted')
-        return render(request,'Groups/mygroup.html',{'group_posts':group_posts,'members':members,'member_requests':requests,'group_name':group.group_name})
+        return render(request,'Groups/mygroup.html',{'group_posts':group_posts,'members':members,'member_requests':requests,'group_name':group.group_name,'owner_name':group.owner.username})
     else:
         return redirect('group_home')
 
@@ -76,20 +64,6 @@ class Group_Post_Create(LoginRequiredMixin,CreateView):
             return redirect('group_home')
 
 
-@login_required
-def create_group_post(request):
-    if request.method == 'POST':
-        form = create_post_form(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.sender = request.user
-            post.save()
-            return redirect('group_home')
-    else:
-        form = create_post_form()
-    return render(request, 'Group/create_group_post.html', {'form': form})
-
-
 class Group_Join_request_Create(LoginRequiredMixin,CreateView):
     model = Group_join_request
     fields = ['group']
@@ -98,23 +72,11 @@ class Group_Join_request_Create(LoginRequiredMixin,CreateView):
 
     def form_valid(self,form):
         form.instance.user_requesting = self.request.user
-        if Group_join_request.objects.filter(group=form.instance.group,user_requesting=self.request.user).count() >= 1:
+        print(self.request.user.username, form.instance.group.owner.username)
+        if Group_join_request.objects.filter(group=form.instance.group,user_requesting=self.request.user).count() >= 1 and self.request.user.username != form.instance.group.owner.username:
             return redirect('group_home')
         else:
             return super().form_valid(form)
-
-@login_required
-def group_join_request(request):
-    if request.method == 'POST':
-        form = create_post_form(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.user_requesting = request.user
-            post.save()
-            return redirect('group_home')
-    else:
-        form = create_post_form()
-    return render(request, 'Group/create_group_join_request.html', {'form': form})
 
 
 @login_required
@@ -122,8 +84,11 @@ def add_group_member(request,group_name,pk):
     group = Group.objects.get(group_name = group_name)
     new_member = User.objects.get(pk=pk)
     if request.user == group.owner:
-        Group.add_member(group_name,new_member)    
+        Group.add_member(group_name,new_member)
+        join_request = Group_join_request.objects.get(group=group,user_requesting=new_member)
+        join_request.delete()
     return redirect('group_home')
+
 
 @login_required
 def remove_group_member(request,group_name,pk):

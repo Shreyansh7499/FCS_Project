@@ -9,6 +9,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
+
 @login_required
 def wallet_home(request):
 	if request.user.is_authenticated:
@@ -19,6 +20,7 @@ def wallet_home(request):
 		except Wallet.DoesNotExist:
 			return redirect('wallet_create') 
 	return render(request, 'Wallet/wallet_home.html')
+
 
 class Wallet_Create(LoginRequiredMixin,CreateView):
     model = Wallet
@@ -32,23 +34,6 @@ class Wallet_Create(LoginRequiredMixin,CreateView):
         	return super().form_valid(form)
         else:
             return redirect('wallet_home')
-
-
-@login_required
-def create_wallet(request):
-
-    if request.method == 'POST':
-        form = create_post_form(request.POST)
-        if form.is_valid() and Wallet.objects.filter(owner=request.user).count() == 0:
-            post = form.save(commit=False)
-            post.owner = request.user
-            post.save()
-            return redirect('wallet_home')
-        else:
-        	return redirect('wallet_home')
-    else:
-        form = create_post_form()
-    return render(request, 'Wallet/wallet_home.html')
 
 
 class Transaction_Create(LoginRequiredMixin,CreateView):
@@ -98,4 +83,3 @@ class Add_Money_Transaction_Create(LoginRequiredMixin,CreateView):
         	return super().form_valid(form)
         else:
         	return redirect('wallet_home')
-

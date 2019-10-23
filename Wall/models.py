@@ -8,8 +8,10 @@ class Post(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField(max_length=1000)
     date_posted = models.DateTimeField(default=timezone.now)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.CASCADE,related_name='post_author')
+    wall_owner = models.ForeignKey(User,on_delete=models.CASCADE,related_name='post_wall_owner')
 
+    
     def __str__(self):
         return self.title
 

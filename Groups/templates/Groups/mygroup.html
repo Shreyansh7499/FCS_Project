@@ -1,14 +1,17 @@
 {% extends "Wall/base.html" %}
 {% block content %}
-	<h1>My group</h1>
+	<h1>My group {{group_name}}</h1>
 	{% if user.is_authenticated %}
 		<a href="{% url 'logout' %}">Logout</a>
 		<a href="{% url 'profile' user.username %}">Profile</a>
-		<a href="{% url 'Wall-create-post' %}">Create Post</a>
-		<a href="{% url 'friend_page' %}">Friends</a>
-		<a href="{% url 'Wall-home' %}">Home</a>
+		<a href="{% url 'Wall-home' %}">My Wall</a>
+		<a href="{% url 'friend_page' %}">My Friends</a>
+		<a href="{% url 'messages_view' %}">My Messages</a>
+		<a href="{% url 'wallet_home' %}">My Wallet</a>
+		
 		<a href="{% url 'group_home' %}">All Group</a>
 		<a href="{% url 'group_post_create' %}">Create Group Post</a>
+		<h1>Owner -> {{owner_name}}</h1> 
     	<h1>Members</h1>
     	{% for member in members %}
 			<div>
@@ -18,6 +21,9 @@
 				</a>
 			</div>
 		{% endfor%}
+		<a href="{% url 'group_join_reequest_create' %}"> 
+			<button type="button" class="btn btn-primary">Request To Join</button>
+		</a>
     	<h1>Group Requests</h1>
     	{% for member_request in member_requests %}
 			<div>
@@ -31,9 +37,9 @@
     	<h1>Group Posts</h1>
     	{% for group_post in group_posts %}
 			<div>
-				<h2>{{group_post.group.group_name}}</h2>
-				<h2>{{group_post.sender}}</h2>
+				<h2>By:{{group_post.sender}}</h2>
 				<h2>{{group_post.message}}</h2>
+				<br>
 			</div>
 		{% endfor%}
 	{% else %}

@@ -7,22 +7,26 @@ from django.core.exceptions import PermissionDenied
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
+from Messages.views import get_friends_matrix
 
 class Post_Create(LoginRequiredMixin,CreateView):
     model = Post
-    fields = ['title','content']
+    fields = ['title','content','wall_owner']
     template_name = 'Wall/create_post.html'
     context_object_name = 'posts'
 
     def form_valid(self,form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        data = get_friends_matrix(form.instance.wall_owner)
+        if self.request.user in data['friends'] or self.request.user == form.instance.wall_owner:
+            return super().form_valid(form)
+        else:
+            return redirect('Wall-home')
 
 
 class Post_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
     model = Post
-    fields = ['title','content']
+    fields = ['title','content','wall_owner']
     template_name = 'Wall/create_post.html'
     context_object_name = 'posts'
 
@@ -51,22 +55,12 @@ class Post_Delete(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
 
 def home(request):
 	if request.user.is_authenticated:
-		data = {'posts': Post.objects.filter(author = request.user).order_by('-date_posted')}	
+		data = {'posts': Post.objects.filter(wall_owner = request.user).order_by('-date_posted')}	
 		return render(request, 'Wall/home.html',data)
 	return render(request, 'Wall/home.html')
 
 
-
-@login_required
-def create_post(request):
-    if request.method == 'POST':
-        form = create_post_form(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('Wall-home')
-    else:
-        form = create_post_form()
-    return render(request, 'Wall/create_post.html', {'form': form})
-
+def post_delete(request,pk):
+    post = Post.objects.get(pk=pk)
+    post.delete()
+    return redirect('Wall-home')
