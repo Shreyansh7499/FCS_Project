@@ -19,6 +19,9 @@
 						{{group.group_name}}
 					</h2>
 				</a>
+				<a href="{% url 'group_join_reequest_create' %}"> 
+					<button type="button" class="btn btn-primary">Request To Join</button>
+				</a>
 				<h2>{{group.description}}</h2>
 			</div>
 		{% endfor%}

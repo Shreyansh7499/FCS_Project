@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'Wall.apps.WallConfig',
     'Messages.apps.MessagesConfig',
     'Groups.apps.GroupsConfig',
+    'Constraint.apps.ConstraintConfig',
     'Wallet.apps.WalletConfig',
     'django.contrib.admin',
     'django.contrib.auth',

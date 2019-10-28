@@ -10,7 +10,10 @@
 		<a href="{% url 'wallet_home' %}">My Wallet</a>
 
 
-    	<h1>My Messages</h1>		
+    	<h1>My Messages</h1>
+    	<a href="{% url 'message_create' %}"> 
+			<button type="button" class="btn btn-primary">Send Message</button>
+		</a>
     	{% for friend in friends %}
 			<div>
 				<a href="{% url 'profile' friend.username %}">

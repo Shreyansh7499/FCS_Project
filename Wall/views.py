@@ -8,6 +8,8 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from Messages.views import get_friends_matrix
+from Constraint.models import Constraint
+from Wallet.models import Wallet
 
 class Post_Create(LoginRequiredMixin,CreateView):
     model = Post
@@ -32,7 +34,9 @@ class Post_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
 
     def form_valid(self,form):
         form.instance.author = self.request.user
-        return super().form_valid(form)
+        data = get_friends_matrix(form.instance.wall_owner)
+        if self.request.user in data['friends'] or self.request.user == form.instance.wall_owner:
+            return super().form_valid(form)
 
     def test_func(self):
         post = self.get_object()
@@ -54,10 +58,19 @@ class Post_Delete(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
 
 
 def home(request):
-	if request.user.is_authenticated:
-		data = {'posts': Post.objects.filter(wall_owner = request.user).order_by('-date_posted')}	
-		return render(request, 'Wall/home.html',data)
-	return render(request, 'Wall/home.html')
+    if request.user.is_authenticated:
+        try:
+            constraint = Constraint.objects.get(owner=request.user)
+        except Constraint.DoesNotExist:
+            return redirect('create_constraint')
+        try:
+            wallet = Wallet.objects.get(owner=request.user)
+        except Wallet.DoesNotExist:
+            return redirect('wallet_create')    
+
+        data = {'posts': Post.objects.filter(wall_owner = request.user).order_by('-date_posted')}	
+        return render(request, 'Wall/home.html',data)
+    return render(request, 'Wall/home.html')
 
 
 def post_delete(request,pk):

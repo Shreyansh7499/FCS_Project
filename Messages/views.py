@@ -10,6 +10,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from Users.views import get_friends_matrix
 from django.contrib.auth.models import User
 from django.db.models import Q
+from Constraint.models import Constraint
+from Wallet.models import Wallet
+
 
 class Message_Create(LoginRequiredMixin,CreateView):
     model = Message
@@ -19,12 +22,16 @@ class Message_Create(LoginRequiredMixin,CreateView):
 
     def form_valid(self,form):
         form.instance.sender = self.request.user
-        data = get_friends_matrix(self.request.user)
-        friend = form.instance.receiver
-        if friend in data['friends']:
+        constraint = Constraint.objects.get(owner = self.request.user)
+        if constraint.user_type == 'commercial':
             return super().form_valid(form)
         else:
-            return redirect('messages_view')
+            data = get_friends_matrix(self.request.user)
+            friend = form.instance.receiver
+            if friend in data['friends']:
+                return super().form_valid(form)
+            else:
+                return redirect('messages_view')
 
 
 def message_view(request):
@@ -36,7 +43,7 @@ def message_view(request):
 
 @login_required
 def chat(request,username):
-    friend = User.objects.get(username=username)
+    friend = User.objects.get(username = username)
     data = get_friends_matrix(request.user)
     if friend in data['friends']:
         messages = Message.objects.filter(Q(sender=friend,receiver=request.user) | Q(sender=request.user,receiver=friend)).order_by('date_posted')

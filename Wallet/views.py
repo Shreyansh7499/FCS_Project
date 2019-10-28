@@ -8,18 +8,22 @@ from .models import *
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-
+from Constraint.models import Constraint
 
 @login_required
 def wallet_home(request):
-	if request.user.is_authenticated:
-		try:
-			wallet = Wallet.objects.get(owner=request.user)
-			transactions = Transaction.objects.filter(receiver=request.user)
-			return render(request, 'Wallet/wallet_home.html',{'money':wallet.money,'transactions':transactions})
-		except Wallet.DoesNotExist:
-			return redirect('wallet_create') 
-	return render(request, 'Wallet/wallet_home.html')
+    if request.user.is_authenticated:
+        try:
+            constraint = Constraint.objects.get(owner=request.user)
+        except Constraint.DoesNotExist:
+            return redirect('create_constraint')
+        try:
+            wallet = Wallet.objects.get(owner=request.user)
+            transactions = Transaction.objects.filter(receiver=request.user)
+            return render(request, 'Wallet/wallet_home.html',{'money':wallet.money,'transactions':transactions})
+        except Wallet.DoesNotExist:
+            return redirect('wallet_create') 
+    return render(request, 'Wallet/wallet_home.html')
 
 
 class Wallet_Create(LoginRequiredMixin,CreateView):
@@ -44,10 +48,35 @@ class Transaction_Create(LoginRequiredMixin,CreateView):
 
     def form_valid(self,form):
         form.instance.sender = self.request.user
-        if Wallet.objects.filter(owner = self.request.user)[0].money >= int(form.instance.amount) and int(form.instance.amount)>0:
-        	return super().form_valid(form)
+        transactions = Transaction.objects.filter(sender=self.request.user)
+        total_pending = 0
+        for transaction in transactions:
+            total_pending += int(transaction.amount)
+        total_pending += int(form.instance.amount)
+
+        constraint = Constraint.objects.get(owner=self.request.user)
+        if constraint.user_type == 'casual':
+            max_transaction = 15
+        elif constraint.user_type == 'commercial':
+            max_transaction = -1
         else:
-            return redirect('wallet_home')
+            max_transaction = 30
+
+        if max_transaction == -1:
+
+            if Wallet.objects.get(owner = self.request.user).money >= int(total_pending) and int(form.instance.amount)>0:
+                constraint.number_of_transactions+=1
+                constraint.save()
+                return super().form_valid(form)
+            else:
+                return redirect('wallet_home')
+        else:
+            if Wallet.objects.get(owner = self.request.user).money >= int(total_pending) and int(form.instance.amount)>0 and max_transaction>constraint.number_of_transactions:
+                constraint.number_of_transactions+=1
+                constraint.save()
+                return super().form_valid(form)
+            else:
+                return redirect('wallet_home')
 
 
 def accept_transaction(request,pk):

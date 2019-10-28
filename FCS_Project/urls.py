@@ -15,7 +15,7 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path,include,reverse_lazy
 from Users import views as user_view
 from django.contrib.auth import views as auth_view
 from Messages import views as messages_view
@@ -23,19 +23,25 @@ from Groups import views as group_view
 from Wallet import views as wallet_view
 from Wall import views as post_view
 from Messages.views import Message_Create
+from Constraint import views as constraint_view
 from Groups.views import Group_Create,Group_Post_Create,Group_Join_request_Create
 from Wallet.views import Wallet_Create,Transaction_Create,Add_Money_Transaction_Create
 from Wall.views import Post_Create,Post_Update
-
+from Constraint.views import Constraint_Create,Constraint_Update
 
 urlpatterns = [
-	path('admin/', admin.site.urls),
-    
+    path('admin/', admin.site.urls),
+
+    path('create_constraint', Constraint_Create.as_view(), name='create_constraint'),
+    path('update_constraint/(?P<pk>\d+)/', Constraint_Update.as_view(), name='update_constraint'),
+    path('update_constraint_start/',constraint_view.update_constraint,name='update_constraint_start'),
+
+
+
     path('', post_view.home, name='Wall-home'),
     path('create_post', Post_Create.as_view(), name='Wall-create-post'),
     path('update_post/(?P<pk>\d+)/', Post_Update.as_view(), name='Wall-update-post'),
     path('delete_post/(?P<pk>\d+)/', post_view.post_delete, name='delete_post'),
-
 
     path('messages/', messages_view.message_view, name='messages_view'),
     path('create_message/', Message_Create.as_view(), name='message_create'),
@@ -59,7 +65,9 @@ urlpatterns = [
     path('profile/(?P<username>.+)/',user_view.profile,name="profile"),
 	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html'), name='login'),
 	path('logout/', auth_view.LogoutView.as_view(template_name='Users/logout.html'), name='logout'),
-    
+    path('change_password/', auth_view.PasswordChangeView.as_view(success_url=reverse_lazy('change_password_done'),template_name='Users/change_password.html'), name='change_password'),
+    path('change_password_done/', auth_view.PasswordChangeDoneView.as_view(template_name='Users/change_password_done.html'), name='change_password_done'),
+
     path('friends/',user_view.friend_page,name="friend_page"),
     path('friends/add_friend/(?P<pk>\d+)/',user_view.add_friend,name="add_friend"),
     path('friends/remove_friend/(?P<pk>\d+)/',user_view.remove_friend,name="remove_friend"),

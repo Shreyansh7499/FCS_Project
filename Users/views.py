@@ -5,9 +5,14 @@ from django.contrib.auth.models import User
 from django import forms
 from django.contrib.auth.decorators import login_required
 from .models import *
+from Constraint.models import Constraint
+from Wallet.models import Wallet
+from django.contrib.auth import update_session_auth_hash
+
 
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField()
+    
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
@@ -25,8 +30,14 @@ def register(request):
 @login_required
 def profile(request,username):
     user = User.objects.get(username=username)
-    # all data for profile is sent through here
-    return render(request,'Users/profile.html',{'profile_username':user.username})
+    constraint = Constraint.objects.get(owner=user)
+    if constraint.user_privacy == 'public':
+        return render(request,'Users/profile.html',{'profile_username':user.username})
+    elif constraint.user_privacy == 'friends':
+        data = get_friends_matrix(user)
+        if request.user in data['friends']:
+            return render(request,'Users/profile.html',{'profile_username':user.username})
+    return render(request, 'Wall/home.html')
 
 
 @login_required
@@ -35,7 +46,6 @@ def friend_page(request):
         data = get_friends_matrix(request.user)
         return render(request, 'Users/friends.html',data)
     return render(request, 'Wall/home.html')
-
 
 def get_friends_matrix(user):
     user_friends = get_one_sided_friends(user)
