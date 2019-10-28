@@ -24,14 +24,14 @@ def group_home(request):
         except Wallet.DoesNotExist:
             return redirect('wallet_create')
 
-        groups = Group.objects.all()
+        groups = Group.objects.filter(user_privacy='public')
         return render(request, 'Groups/group_home.html',{'groups':groups})
     return render(request, 'Groups/group_home.html')
 
 
 class Group_Create(LoginRequiredMixin,CreateView):
     model = Group
-    fields = ['group_name','description']
+    fields = ['group_name','description','cost','user_privacy']
     template_name = 'Groups/create_group.html'
     context_object_name = 'groups'
 
@@ -71,10 +71,14 @@ def mygroup(request,group_name):
     group = Group.objects.filter(group_name=group_name)[0]
     requests = Group_join_request.objects.filter(group=group).exclude(user_requesting=group.owner).order_by('-date_posted')
     members = group.members.all()
+    
+    members_name = []
+    for member in members:
+        members_name.append(member.username)
 
     if request.user in group.members.all() or request.user == group.owner:
         group_posts = Group_post.objects.filter(group=group).order_by('-date_posted')
-        return render(request,'Groups/mygroup.html',{'group_posts':group_posts,'members':members,'member_requests':requests,'group_name':group.group_name,'owner_name':group.owner.username})
+        return render(request,'Groups/mygroup.html',{'group_posts':group_posts,'members':members_name,'member_requests':requests,'group_name':group.group_name,'owner_name':group.owner.username})
     else:
         return redirect('group_home')
 
@@ -114,8 +118,15 @@ class Group_Join_request_Create(LoginRequiredMixin,CreateView):
 def add_group_member(request,group_name,pk):
     group = Group.objects.get(group_name = group_name)
     new_member = User.objects.get(pk=pk)
-
-    if request.user == group.owner:
+    wallet = Wallet.objects.get(owner=new_member)
+    wallet_admin = Wallet.objects.get(owner=group.owner)
+    if request.user == group.owner and wallet.money >= group.cost:
+        print("before: ",wallet.money,wallet_admin.money,group.cost)
+        wallet.money = wallet.money - group.cost
+        wallet_admin.money = wallet_admin.money + group.cost
+        wallet.save()
+        wallet_admin.save()
+        print("after: ",wallet.money,wallet_admin.money,group.cost)
         Group.add_member(group_name,new_member)
         join_request = Group_join_request.objects.get(group=group,user_requesting=new_member)
         join_request.delete()
@@ -123,9 +134,10 @@ def add_group_member(request,group_name,pk):
 
 
 @login_required
-def remove_group_member(request,group_name,pk):
+def remove_group_member(request,group_name,username):
     group = Group.objects.get(group_name = group_name)
-    new_member = User.objects.get(pk=pk)
+
+    new_member = User.objects.get(username=username)
     
     if request.user == group.owner:
         Group.remove_member(group_name,new_member)    

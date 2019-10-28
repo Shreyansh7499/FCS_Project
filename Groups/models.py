@@ -2,6 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
+from model_utils import Choices
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Group(models.Model):
@@ -10,9 +12,12 @@ class Group(models.Model):
     date_posted = models.DateTimeField(default=timezone.now,null=True,blank=True)
     group_name = models.TextField(max_length=100,unique=True)
     members = models.ManyToManyField(User)
-    
+    cost = models.IntegerField(default = 0,validators=[MinValueValidator(0)])
+    privacy_choices = Choices('private','public')
+    user_privacy = models.CharField(choices=privacy_choices, default=privacy_choices.public, max_length=20)
+
     def __str__(self):
-        return str(self.group_name +" by: " + self.owner.username)
+        return str(self.group_name +" by: " + self.owner.username+ str(self.user_privacy))
 
     def get_absolute_url(self):
         return reverse('group_home')

@@ -33,42 +33,42 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('create_constraint', Constraint_Create.as_view(), name='create_constraint'),
-    path('update_constraint/(?P<pk>\d+)/', Constraint_Update.as_view(), name='update_constraint'),
+    path('update_constraint/<int:pk>/', Constraint_Update.as_view(), name='update_constraint'),
     path('update_constraint_start/',constraint_view.update_constraint,name='update_constraint_start'),
 
 
 
     path('', post_view.home, name='Wall-home'),
     path('create_post', Post_Create.as_view(), name='Wall-create-post'),
-    path('update_post/(?P<pk>\d+)/', Post_Update.as_view(), name='Wall-update-post'),
-    path('delete_post/(?P<pk>\d+)/', post_view.post_delete, name='delete_post'),
+    path('update_post/<int:pk>/', Post_Update.as_view(), name='Wall-update-post'),
+    path('delete_post/<int:pk>/', post_view.post_delete, name='delete_post'),
 
     path('messages/', messages_view.message_view, name='messages_view'),
     path('create_message/', Message_Create.as_view(), name='message_create'),
-    path('chat/(?P<username>.+)/',messages_view.chat,name="chat"),
+    path('chat/<str:username>/',messages_view.chat,name="chat"),
 
     path('groups/', group_view.group_home, name='group_home'),
     path('create_group/', Group_Create.as_view(), name='group_create'),
     path('create_group_post/', Group_Post_Create.as_view(), name='group_post_create'),
-    path('mygroup/(?P<group_name>.+)/',group_view.mygroup,name="mygroup"),
+    path('mygroup/<str:group_name>/',group_view.mygroup,name="mygroup"),
     path('create_group_join_request/', Group_Join_request_Create.as_view(), name='group_join_reequest_create'),
-    path('add_group_member/(?P<group_name>.+)/(?P<pk>\d+)/',group_view.add_group_member,name="add_group_member"),
-    path('remove_group_member/(?P<group_name>.+)/(?P<pk>\d+)/',group_view.remove_group_member,name="remove_group_member"),
+    path('add_group_member/<str:group_name>/<int:pk>/',group_view.add_group_member,name="add_group_member"),
+    path('remove_group_member/<str:group_name>/<str:username>/',group_view.remove_group_member,name="remove_group_member"),
 
     path('wallet/', wallet_view.wallet_home, name='wallet_home'),
     path('create_wallet/', Wallet_Create.as_view(), name='wallet_create'),
     path('create_transaction/', Transaction_Create.as_view(), name='transaction_create'),
     path('create_add_money_transaction/', Add_Money_Transaction_Create.as_view(), name='add_money_transaction_create'),
-    path('accept_transaction/(?P<pk>\d+)/', wallet_view.accept_transaction, name='accept_transaction'),
+    path('accept_transaction/<int:pk>/', wallet_view.accept_transaction, name='accept_transaction'),
 
     path('register/',user_view.register,name="register"),
-    path('profile/(?P<username>.+)/',user_view.profile,name="profile"),
+    path('profile/<str:username>/',user_view.profile,name="profile"),
 	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html'), name='login'),
 	path('logout/', auth_view.LogoutView.as_view(template_name='Users/logout.html'), name='logout'),
     path('change_password/', auth_view.PasswordChangeView.as_view(success_url=reverse_lazy('change_password_done'),template_name='Users/change_password.html'), name='change_password'),
     path('change_password_done/', auth_view.PasswordChangeDoneView.as_view(template_name='Users/change_password_done.html'), name='change_password_done'),
 
     path('friends/',user_view.friend_page,name="friend_page"),
-    path('friends/add_friend/(?P<pk>\d+)/',user_view.add_friend,name="add_friend"),
-    path('friends/remove_friend/(?P<pk>\d+)/',user_view.remove_friend,name="remove_friend"),
+    path('friends/add_friend/<int:pk>/',user_view.add_friend,name="add_friend"),
+    path('friends/remove_friend/<int:pk>/',user_view.remove_friend,name="remove_friend"),
 ]

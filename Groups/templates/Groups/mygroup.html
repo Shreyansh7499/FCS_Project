@@ -15,15 +15,12 @@
     	<h1>Members</h1>
     	{% for member in members %}
 			<div>
-				<h2>{{member.username}}</h2>
-				<a href="{% url 'remove_group_member' group_name=group_name pk=member.pk %}"> 
+				<h2>{{member}}</h2>
+				<a href="{% url 'remove_group_member' group_name=group_name username=member %}"> 
 					<button type="button" class="btn btn-primary">remove user from Group</button>
 				</a>
 			</div>
 		{% endfor%}
-		<a href="{% url 'group_join_reequest_create' %}"> 
-			<button type="button" class="btn btn-primary">Request To Join</button>
-		</a>
     	<h1>Group Requests</h1>
     	{% for member_request in member_requests %}
 			<div>
