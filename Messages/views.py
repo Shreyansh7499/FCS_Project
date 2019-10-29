@@ -35,18 +35,24 @@ class Message_Create(LoginRequiredMixin,CreateView):
 
 
 def message_view(request):
-	if request.user.is_authenticated:
-		data = get_friends_matrix(request.user)	
-		return render(request, 'Messages/message_view.html',data)
-	return render(request, 'Messages/message_view.html')
+    if request.user.is_authenticated:
+        data = get_friends_matrix(request.user)
+        friends_usernames = []
+        for i in data['friends']:
+            friends_usernames.append(i.username)
+        return render(request, 'Messages/message_view.html',{"friends_usernames":friends_usernames})
+    return redirect('login')
 
 
 @login_required
 def chat(request,username):
-    friend = User.objects.get(username = username)
-    data = get_friends_matrix(request.user)
-    if friend in data['friends']:
-        messages = Message.objects.filter(Q(sender=friend,receiver=request.user) | Q(sender=request.user,receiver=friend)).order_by('date_posted')
-        return render(request,'Messages/chat.html',{'messages':messages})
+    if request.user.is_authenticated:
+        friend = User.objects.get(username = username)
+        data = get_friends_matrix(request.user)
+        if friend in data['friends']:
+            messages = Message.objects.filter(Q(sender=friend,receiver=request.user) | Q(sender=request.user,receiver=friend)).order_by('date_posted')
+            return render(request,'Messages/chat.html',{'messages':messages})
+        else:
+            return redirect('messages_view')
     else:
-        return render(request,'Messages/message_view.html',{'messages':messages})
+        return redirect('login')

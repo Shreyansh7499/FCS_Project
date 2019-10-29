@@ -10,6 +10,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from Messages.views import get_friends_matrix
 from Constraint.models import Constraint
 from Wallet.models import Wallet
+from django.contrib.auth.models import User
+
 
 class Post_Create(LoginRequiredMixin,CreateView):
     model = Post
@@ -50,7 +52,7 @@ class Post_Delete(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
 
     def test_func(self):
         post = self.get_object()
-        if self.request.user == post.author:
+        if self.request.user == post.author or self.request.user == post.wall_owner:
             return True
         return False
     success_url = '/Wall'
@@ -70,10 +72,17 @@ def home(request):
 
         data = {'posts': Post.objects.filter(wall_owner = request.user).order_by('-date_posted')}	
         return render(request, 'Wall/home.html',data)
-    return render(request, 'Wall/home.html')
+    return redirect('login')
 
 
-def post_delete(request,pk):
-    post = Post.objects.get(pk=pk)
-    post.delete()
-    return redirect('Wall-home')
+def friend_wall(request,username):
+    if request.user.is_authenticated:
+        friend = User.objects.get(username=username)
+        data = get_friends_matrix(friend)
+        if request.user in data['friends']:
+            posts = {'posts': Post.objects.filter(wall_owner = friend).order_by('-date_posted')}
+            return render(request, 'Wall/friend_wall.html',posts)
+        else:
+            return redirect('Wall-home')
+    else:
+        return redirect('login')

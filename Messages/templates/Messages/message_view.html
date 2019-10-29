@@ -14,14 +14,14 @@
     	<a href="{% url 'message_create' %}"> 
 			<button type="button" class="btn btn-primary">Send Message</button>
 		</a>
-    	{% for friend in friends %}
+    	{% for name in friends_usernames %}
 			<div>
 				<a href="{% url 'profile' friend.username %}">
 					<h2>
-						{{friend.username}}
+						{{name}}
 					</h2>
 				</a>
-				<a href="{% url 'chat' username=friend.username %}"> 
+				<a href="{% url 'chat' username=name %}"> 
 					<button type="button" class="btn btn-primary">View Chat</button>
 				</a>
 				<a href="{% url 'message_create' %}"> 

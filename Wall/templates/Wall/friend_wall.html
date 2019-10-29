@@ -1,16 +1,8 @@
 {% extends "Wall/base.html" %}
 {% block content %}
-	<h1>Home Page</h1>
+	<h1>Friend Wall</h1>
 	{% if user.is_authenticated %}
-		<a href="{% url 'logout' %}">Logout</a>
-		<a href="{% url 'profile' user.username %}">Profile</a>
-		<a href="{% url 'group_home' %}">My groups</a>
-		<a href="{% url 'friend_page' %}">My Friends</a>
-		<a href="{% url 'messages_view' %}">My Messages</a>
-		<a href="{% url 'wallet_home' %}">My Wallet</a>
-		<a href="{% url 'update_constraint_start' %}">Update Settings</a>
-		<a href="{% url 'change_password' %}">Change Password</a>
-		<a href="{% url 'Wall-create-post' %}">Create Post</a>
+		<a href="{% url 'Wall-home' %}">Back to my Wall</a>
     	{% for post in posts %}
 			<div>
 				<h1>{{post.author}}</h1>
@@ -26,7 +18,7 @@
 			</div>
 		{% endfor%}
 	{% else %}
-		<a href="{% url 'login' %}">Log In</a>
+		<a href="{% url 'login' %}">Log In First</a>
 	{% endif %}
     
 {% endblock content %}

@@ -22,6 +22,12 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
+            print(form.instance.username,"username")
+            new_user = User.objects.get(username = form.instance.username)
+            wallet = Wallet.objects.create(owner=new_user)
+            wallet.save()
+            constraint = Constraint.objects.create(owner=new_user)
+            constraint.save()
             return redirect('login')
     else:
         form = RegistrationForm()
@@ -29,15 +35,17 @@ def register(request):
 
 @login_required
 def profile(request,username):
-    user = User.objects.get(username=username)
-    constraint = Constraint.objects.get(owner=user)
-    if constraint.user_privacy == 'public':
-        return render(request,'Users/profile.html',{'profile_username':user.username})
-    elif constraint.user_privacy == 'friends':
-        data = get_friends_matrix(user)
-        if request.user in data['friends']:
+    if request.user.is_authenticated:
+        user = User.objects.get(username=username)
+        constraint = Constraint.objects.get(owner=user)
+        if constraint.user_privacy == 'public':
             return render(request,'Users/profile.html',{'profile_username':user.username})
-    return render(request, 'Wall/home.html')
+        elif constraint.user_privacy == 'friends':
+            data = get_friends_matrix(user)
+            if request.user in data['friends']:
+                return render(request,'Users/profile.html',{'profile_username':user.username})
+        return render(request, 'Wall/home.html')
+    return redirect('login')
 
 
 @login_required
@@ -45,7 +53,7 @@ def friend_page(request):
     if request.user.is_authenticated:
         data = get_friends_matrix(request.user)
         return render(request, 'Users/friends.html',data)
-    return render(request, 'Wall/home.html')
+    return redirect('login')
 
 def get_friends_matrix(user):
     user_friends = get_one_sided_friends(user)
@@ -87,14 +95,20 @@ def get_usernames(users):
 
 @login_required
 def add_friend(request,pk):
-    new_friend = User.objects.get(pk=pk)
-    Friend.add_friend(request.user,new_friend)
-    return redirect('friend_page')
+    if request.user.is_authenticated:
+        new_friend = User.objects.get(pk=pk)
+        Friend.add_friend(request.user,new_friend)
+        return redirect('friend_page')
+    else:
+        return redirect('login')
 
 @login_required
 def remove_friend(request,pk):
-    new_friend = User.objects.get(pk=pk)
-    Friend.remove_friend(request.user,new_friend)
-    return redirect('friend_page')      
+    if request.user.is_authenticated:
+        new_friend = User.objects.get(pk=pk)
+        Friend.remove_friend(request.user,new_friend)
+        return redirect('friend_page')   
+    else:
+        return redirect('login')   
 
     

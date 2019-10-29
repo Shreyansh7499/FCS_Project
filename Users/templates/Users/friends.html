@@ -18,6 +18,9 @@
 						{{friend.username}}
 					</h2>
 				</a>
+				<a href="{% url 'friend_wall' username=friend.username %}"> 
+					<button type="button" class="btn btn-primary">Friend Wall</button>
+				</a>
 				<a href="{% url 'remove_friend' pk=friend.pk %}"> 
 					<button type="button" class="btn btn-primary">Remove Friend</button>
 				</a>

@@ -11,6 +11,8 @@
 		
 		<a href="{% url 'group_home' %}">All Group</a>
 		<a href="{% url 'group_post_create' %}">Create Group Post</a>
+		<a href="{% url 'group_update' %}">Update Group</a>
+
 		<h1>Owner -> {{owner_name}}</h1> 
     	<h1>Members</h1>
     	{% for member in members %}

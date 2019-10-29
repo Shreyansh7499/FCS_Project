@@ -90,14 +90,17 @@ class Constraint_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
 
 @login_required
 def update_constraint(request):
-    print(request.user.username,request.user.pk)
-    user = User.objects.get(pk=request.user.pk)
-    try:
-        constraint = Constraint.objects.get(owner=request.user)
-    except Constraint.DoesNotExist:
-        return redirect('create_constraint')
-    try:
-        wallet = Wallet.objects.get(owner=request.user)
-    except Wallet.DoesNotExist:
-        return redirect('wallet_create')
-    return redirect('update_constraint',pk=constraint.pk)
+    if request.user.is_authenticated:
+        print(request.user.username,request.user.pk)
+        user = User.objects.get(pk=request.user.pk)
+        try:
+            constraint = Constraint.objects.get(owner=request.user)
+        except Constraint.DoesNotExist:
+            return redirect('create_constraint')
+        try:
+            wallet = Wallet.objects.get(owner=request.user)
+        except Wallet.DoesNotExist:
+            return redirect('wallet_create')
+        return redirect('update_constraint',pk=constraint.pk)
+    else:
+        return redirect('login')

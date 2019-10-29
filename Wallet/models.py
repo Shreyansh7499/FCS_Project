@@ -11,6 +11,16 @@ class Wallet(models.Model):
     def __str__(self):
         return str(self.owner.username +" by: " + str(self.money))
 
+    # @classmethod
+    # def create(cls,user):
+    # 	wallet = cls(owner=user)
+    # 	return wallet
+
+    # def __init__(self,user):
+    # 	owner = user
+    # 	# money = 0
+
+
     def get_absolute_url(self):
         return reverse('wallet_home')
 

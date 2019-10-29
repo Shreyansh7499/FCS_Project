@@ -23,9 +23,18 @@ def group_home(request):
             wallet = Wallet.objects.get(owner=request.user)
         except Wallet.DoesNotExist:
             return redirect('wallet_create')
-
+        
+        mygroups_admin = Group.objects.filter(owner=request.user) 
+        groups_owned = []
+        for i in mygroups_admin:
+            groups_owned.append(i.group_name)
+        my_groups_member_group_name = []
+        all_groups = Group.objects.all()
+        for grp in all_groups:
+            if request.user in grp.members.all():
+                my_groups_member_group_name.append(grp.group_name)
         groups = Group.objects.filter(user_privacy='public')
-        return render(request, 'Groups/group_home.html',{'groups':groups})
+        return render(request, 'Groups/group_home.html',{'groups':groups,'my_groups':groups_owned,'my_groups_members':my_groups_member_group_name})
     return render(request, 'Groups/group_home.html')
 
 
@@ -58,29 +67,43 @@ class Group_Create(LoginRequiredMixin,CreateView):
             constraint.number_of_groups+=1
             constraint.save()
             return super().form_valid(form)
-        # data = get_friends_matrix(self.request.user)
-        # friend = form.instance.receiver
-        # print(friend)
-        # if friend in data['friends']:
-        # else:
-        #     return redirect('messages_view')
 
+
+class Group_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
+    model = Group
+    fields = ['description','cost','user_privacy']
+    template_name = 'Groups/create_group.html'
+    context_object_name = 'groups'
+
+    def form_valid(self,form):
+        form.instance.owner = self.request.user
+        constraint = Constraint.objects.get(owner = self.request.user)
+        return super().form_valid(form)
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.owner:
+            return True
+        return False
 
 @login_required
 def mygroup(request,group_name):
-    group = Group.objects.filter(group_name=group_name)[0]
-    requests = Group_join_request.objects.filter(group=group).exclude(user_requesting=group.owner).order_by('-date_posted')
-    members = group.members.all()
-    
-    members_name = []
-    for member in members:
-        members_name.append(member.username)
+    if request.user.is_authenticated:
+        group = Group.objects.filter(group_name=group_name)[0]
+        requests = Group_join_request.objects.filter(group=group).exclude(user_requesting=group.owner).order_by('-date_posted')
+        members = group.members.all()
+        
+        members_name = []
+        for member in members:
+            members_name.append(member.username)
 
-    if request.user in group.members.all() or request.user == group.owner:
-        group_posts = Group_post.objects.filter(group=group).order_by('-date_posted')
-        return render(request,'Groups/mygroup.html',{'group_posts':group_posts,'members':members_name,'member_requests':requests,'group_name':group.group_name,'owner_name':group.owner.username})
+        if request.user in group.members.all() or request.user == group.owner:
+            group_posts = Group_post.objects.filter(group=group).order_by('-date_posted')
+            return render(request,'Groups/mygroup.html',{'group_posts':group_posts,'members':members_name,'member_requests':requests,'group_name':group.group_name,'owner_name':group.owner.username})
+        else:
+            return redirect('group_home')
     else:
-        return redirect('group_home')
+        return redirect('login')
 
 
 class Group_Post_Create(LoginRequiredMixin,CreateView):
@@ -116,29 +139,34 @@ class Group_Join_request_Create(LoginRequiredMixin,CreateView):
 
 @login_required
 def add_group_member(request,group_name,pk):
-    group = Group.objects.get(group_name = group_name)
-    new_member = User.objects.get(pk=pk)
-    wallet = Wallet.objects.get(owner=new_member)
-    wallet_admin = Wallet.objects.get(owner=group.owner)
-    if request.user == group.owner and wallet.money >= group.cost:
-        print("before: ",wallet.money,wallet_admin.money,group.cost)
-        wallet.money = wallet.money - group.cost
-        wallet_admin.money = wallet_admin.money + group.cost
-        wallet.save()
-        wallet_admin.save()
-        print("after: ",wallet.money,wallet_admin.money,group.cost)
-        Group.add_member(group_name,new_member)
-        join_request = Group_join_request.objects.get(group=group,user_requesting=new_member)
-        join_request.delete()
-    return redirect('group_home')
+    if request.user.is_authenticated:
+        group = Group.objects.get(group_name = group_name)
+        new_member = User.objects.get(pk=pk)
+        wallet = Wallet.objects.get(owner=new_member)
+        wallet_admin = Wallet.objects.get(owner=group.owner)
+        if request.user == group.owner and wallet.money >= group.cost:
+            print("before: ",wallet.money,wallet_admin.money,group.cost)
+            wallet.money = wallet.money - group.cost
+            wallet_admin.money = wallet_admin.money + group.cost
+            wallet.save()
+            wallet_admin.save()
+            print("after: ",wallet.money,wallet_admin.money,group.cost)
+            Group.add_member(group_name,new_member)
+            join_request = Group_join_request.objects.get(group=group,user_requesting=new_member)
+            join_request.delete()
+        return redirect('group_home')
+    else:
+        return redirect('login')
 
 
 @login_required
 def remove_group_member(request,group_name,username):
-    group = Group.objects.get(group_name = group_name)
+    if request.user.is_authenticated:
+        group = Group.objects.get(group_name = group_name)
 
-    new_member = User.objects.get(username=username)
-    
-    if request.user == group.owner:
-        Group.remove_member(group_name,new_member)    
-    return redirect('group_home')
+        new_member = User.objects.get(username=username)
+        
+        if request.user == group.owner:
+            Group.remove_member(group_name,new_member)    
+        return redirect('group_home')
+    return redirect('login')

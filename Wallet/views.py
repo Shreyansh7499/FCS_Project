@@ -23,7 +23,7 @@ def wallet_home(request):
             return render(request, 'Wallet/wallet_home.html',{'money':wallet.money,'transactions':transactions})
         except Wallet.DoesNotExist:
             return redirect('wallet_create') 
-    return render(request, 'Wallet/wallet_home.html')
+    return redirect('login')
 
 
 class Wallet_Create(LoginRequiredMixin,CreateView):
@@ -80,20 +80,23 @@ class Transaction_Create(LoginRequiredMixin,CreateView):
 
 
 def accept_transaction(request,pk):
-	transaction = Transaction.objects.get(pk=pk)
-	wallet_sender = Wallet.objects.get(owner=transaction.sender)
-	wallet_receiver = Wallet.objects.get(owner=transaction.receiver)	
+    if request.user.is_authenticated:
+    	transaction = Transaction.objects.get(pk=pk)
+    	wallet_sender = Wallet.objects.get(owner=transaction.sender)
+    	wallet_receiver = Wallet.objects.get(owner=transaction.receiver)	
 
-	if request.user == transaction.receiver:
-		if wallet_sender.money >= int(transaction.amount):
-			wallet_sender.money = wallet_sender.money - int(transaction.amount)
-			wallet_receiver.money = wallet_receiver.money + int(transaction.amount)
-			wallet_receiver.save()
-			wallet_sender.save()
-			Transaction_Log.objects.create(sender=transaction.sender,receiver=transaction.receiver,amount=transaction.amount)
-			transaction.delete()
-	
-	return redirect('wallet_home')
+    	if request.user == transaction.receiver:
+    		if wallet_sender.money >= int(transaction.amount):
+    			wallet_sender.money = wallet_sender.money - int(transaction.amount)
+    			wallet_receiver.money = wallet_receiver.money + int(transaction.amount)
+    			wallet_receiver.save()
+    			wallet_sender.save()
+    			Transaction_Log.objects.create(sender=transaction.sender,receiver=transaction.receiver,amount=transaction.amount)
+    			transaction.delete()
+    	
+    	return redirect('wallet_home')
+    else:
+        return redirect('login')
 
 
 class Add_Money_Transaction_Create(LoginRequiredMixin,CreateView):

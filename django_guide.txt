@@ -47,3 +47,6 @@ friends -
 security cannot be pk, we need to authenticate
 
 always add money grrater than 0
+
+
+show post of friends when they are removed?
