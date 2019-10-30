@@ -1,0 +1,24 @@
+{% extends "Wall/base.html" %}
+{% block content %}
+	<h1>Commercial Page</h1>
+	{% if user.is_authenticated %}
+		<a href="{% url 'Wall-home' %}">Home</a>
+    	{% for post in posts %}
+			<div>
+				<h1>{{post.author}}</h1>
+				<h2>{{post.date_posted|date:"F d, Y"}}</h2>  
+				<h2>{{post.title}}</h2>
+				<h2>{{post.content}}</h2>
+				<a href="{% url 'delete_commercial_post' pk=post.pk %}"> 
+					<button type="button" class="btn btn-primary">delete post</button>
+				</a>
+				<a href="{% url 'Wall-update-commercial-post' pk=post.pk %}"> 
+					<button type="button" class="btn btn-primary">update post</button>
+				</a>
+			</div>
+		{% endfor%}
+	{% else %}
+		<a href="{% url 'login' %}">Log In</a>
+	{% endif %}
+    
+{% endblock content %}

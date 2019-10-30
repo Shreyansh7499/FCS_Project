@@ -1,0 +1,45 @@
+{% extends "Wall/base.html" %}
+{% block content %}
+	<h1>Messages</h1>
+	{% if user.is_authenticated %}
+		<a href="{% url 'logout' %}">Logout</a>
+		<a href="{% url 'profile' user.username %}">Profile</a>
+		<a href="{% url 'Wall-home' %}">My Wall</a>
+		<a href="{% url 'group_home' %}">My groups</a>
+		<a href="{% url 'friend_page' %}">My Friends</a>
+		<a href="{% url 'wallet_home' %}">My Wallet</a>
+
+
+    	<h1>My Messages</h1>
+    	<a href="{% url 'message_create' %}"> 
+			<button type="button" class="btn btn-primary">Send Message</button>
+		</a>
+		<h1>Message from Commercial Users</h1>
+		{% for messages in ads %}
+			{% for message in messages %}
+				<h2>SENDER: {{message.sender.username}}</h2>
+				<h3>MESSAGE: {{message.message}}</h3>
+				<br>
+				<br>
+			{% endfor%}
+		{% endfor%}
+    	{% for name in friends_usernames %}
+			<div>
+				<a href="{% url 'profile' name %}">
+					<h2>
+						{{name}}
+					</h2>
+				</a>
+				<a href="{% url 'chat' username=name %}"> 
+					<button type="button" class="btn btn-primary">View Chat</button>
+				</a>
+				<a href="{% url 'message_create' %}"> 
+					<button type="button" class="btn btn-primary">Send Message</button>
+				</a>
+			</div>
+		{% endfor%}
+	{% else %}
+		<a href="{% url 'login' %}">Log In</a>
+	{% endif %}
+    
+{% endblock content %}

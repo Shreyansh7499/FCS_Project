@@ -33,7 +33,13 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'Users.apps.UsersConfig',
     'Wall.apps.WallConfig',
+    'Messages.apps.MessagesConfig',
+    'Groups.apps.GroupsConfig',
+    'Constraint.apps.ConstraintConfig',
+    'Wallet.apps.WalletConfig',
     'django.contrib.admin',
+    'django_otp',
+    'django_otp.plugins.otp_totp',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -46,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -123,3 +130,10 @@ STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = 'Wall-home'
 LOGIN_URL = 'login'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'fcs.project123@gmail.com'
+EMAIL_HOST_PASSWORD = 'Anishmadarchod@123'

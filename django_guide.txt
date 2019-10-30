@@ -10,3 +10,43 @@ python manage.py migrate - set up new tables after prev cmd
 References:
 
 https://docs.djangoproject.com/en/2.2/topics/class-based-views/generic-editing/ for create,update,delete
+
+make every user which is not autheticated
+    return redirect('login')
+
+
+duplicate entries in db
+class Group_Join_request_Create(LoginRequiredMixin,CreateView):
+    model = Group_join_request
+    fields = ['group']
+    template_name = 'Groups/create_group_join_request.html'
+    context_object_name = 'group_join_request'
+
+    def form_valid(self,form):
+        form.instance.user_requesting = self.request.user
+        if Group_join_request.objects.filter(group=form.instance.group,user_requesting=self.request.user).count() >= 1:
+            return redirect('group_home')
+        else:
+            return super().form_valid(form)
+
+
+type     groups     price     transactions
+
+casual - 0      0               15
+silver - 2      50              30
+gold   - 4      100             30
+plat   - inf    150             30
+commercial - inf 5000           inf
+
+public  -
+private -
+friends -
+
+
+
+security cannot be pk, we need to authenticate
+
+always add money grrater than 0
+
+
+show post of friends when they are removed?

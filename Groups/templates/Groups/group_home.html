@@ -1,0 +1,63 @@
+{% extends "Wall/base.html" %}
+{% block content %}
+	<h1>Groups</h1>
+	{% if user.is_authenticated %}
+		<a href="{% url 'logout' %}">Logout</a>
+		<a href="{% url 'profile' user.username %}">Profile</a>
+		<a href="{% url 'Wall-home' %}">My Wall</a>
+		<a href="{% url 'friend_page' %}">My Friends</a>
+		<a href="{% url 'messages_view' %}">My Messages</a>
+		<a href="{% url 'wallet_home' %}">My Wallet</a>
+
+		<a href="{% url 'group_create' %}">Create Group</a>
+
+		<h1>Groups Owned</h1>
+    	{% for group in mygroups_admin %}
+			<div>
+				<a href="{% url 'mygroup' group.group_name %}">
+					<h2>
+						{{group.group_name}}
+					</h2>
+				</a>
+				<a href="{% url 'group_join_reequest_create' %}"> 
+					<button type="button" class="btn btn-primary">Request To Join</button>
+				</a>
+				<h2>{{group.description}}</h2>
+			</div>
+		{% endfor%}
+
+
+		<h1>My Groups</h1>
+    	{% for group in my_groups_members %}
+			<div>
+				<a href="{% url 'mygroup' group %}">
+					<h2>
+						{{group}}
+					</h2>
+				</a>
+				<a href="{% url 'group_join_reequest_create' %}"> 
+					<button type="button" class="btn btn-primary">Request To Join</button>
+				</a>
+				<h2>{{group.description}}</h2>
+			</div>
+		{% endfor%}
+
+    	<h1>All Groups</h1>
+    	{% for group in groups %}
+			<div>
+				<a href="{% url 'mygroup' group.group_name %}">
+					<h2>
+						{{group.group_name}}
+					</h2>
+				</a>
+				<a href="{% url 'group_join_reequest_create' %}"> 
+					<button type="button" class="btn btn-primary">Request To Join</button>
+				</a>
+				<h2>{{group.description}}</h2>
+			</div>
+		{% endfor%}
+	{% else %}
+		<a href="{% url 'login' %}">Log In</a>
+	{% endif %}
+    
+{% endblock content %}
