@@ -16,7 +16,7 @@
 		</a>
     	{% for name in friends_usernames %}
 			<div>
-				<a href="{% url 'profile' friend.username %}">
+				<a href="{% url 'profile' name %}">
 					<h2>
 						{{name}}
 					</h2>

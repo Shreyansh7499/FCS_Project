@@ -11,15 +11,6 @@ class Wallet(models.Model):
     def __str__(self):
         return str(self.owner.username +" by: " + str(self.money))
 
-    # @classmethod
-    # def create(cls,user):
-    # 	wallet = cls(owner=user)
-    # 	return wallet
-
-    # def __init__(self,user):
-    # 	owner = user
-    # 	# money = 0
-
 
     def get_absolute_url(self):
         return reverse('wallet_home')
@@ -34,16 +25,22 @@ class Transaction(models.Model):
 	receiver = models.ForeignKey(User,related_name='transaction_receiver',on_delete=models.CASCADE)
 	amount = models.IntegerField(default = 0)
 	date_posted = models.DateTimeField(default=timezone.now)
-
+	otp = models.IntegerField(default=-1)
+	
 	def __str__(self):
 		return str(self.sender.username +" to: "+ self.receiver.username + " amount:" + str(self.amount))
-
+		
 	def get_absolute_url(self):
 		return reverse('wallet_home')
 
 	def form_valid(self, form):
 		form.instance.created_by = self.request.user
 		return super().form_valid(form)
+
+
+class OTP(models.Model):
+	owner = models.ForeignKey(User,related_name='otp_owner',on_delete=models.CASCADE)
+	otp = models.IntegerField(default=-1)
 
 class Add_Money_Transaction(models.Model):
 	sender = models.ForeignKey(User,related_name='add_money_transaction_sender',on_delete=models.CASCADE)

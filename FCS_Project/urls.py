@@ -30,10 +30,12 @@ from Wall.views import Post_Create,Post_Update,friend_wall,Post_Delete
 from Constraint.views import Constraint_Create,Constraint_Update
 from django_otp.forms import OTPAuthenticationForm
 from Users import forms as user_forms
-
+from django.conf.urls import url
+# from Users.views import Fakeuser_Login_Create
 urlpatterns = [
     path('admin/', admin.site.urls),
 
+    
     path('create_constraint', Constraint_Create.as_view(), name='create_constraint'),
     path('update_constraint/<int:pk>/', Constraint_Update.as_view(), name='update_constraint'),
     path('update_constraint_start/',constraint_view.update_constraint,name='update_constraint_start'),
@@ -43,7 +45,7 @@ urlpatterns = [
     path('', post_view.home, name='Wall-home'),
     path('create_post', Post_Create.as_view(), name='Wall-create-post'),
     path('update_post/<int:pk>/', Post_Update.as_view(), name='Wall-update-post'),
-    path('delete_post/<int:pk>/', Post_Delete.as_view(), name='delete_post'),
+    path('delete_post/<int:pk>/', Post_Delete.as_view(success_url=reverse_lazy('Wall-home')), name='delete_post'),
     path('friend_wall/<str:username>/',post_view.friend_wall, name = 'friend_wall'),
     path('messages/', messages_view.message_view, name='messages_view'),
     path('create_message/', Message_Create.as_view(), name='message_create'),
@@ -61,9 +63,11 @@ urlpatterns = [
     path('wallet/', wallet_view.wallet_home, name='wallet_home'),
     path('create_wallet/', Wallet_Create.as_view(), name='wallet_create'),
     path('create_transaction/', Transaction_Create.as_view(), name='transaction_create'),
+    path('create_transaction_start/', wallet_view.create_transcation_start, name='transaction_create_start'),
     path('create_add_money_transaction/', Add_Money_Transaction_Create.as_view(), name='add_money_transaction_create'),
     path('accept_transaction/<int:pk>/', wallet_view.accept_transaction, name='accept_transaction'),
 
+    # path('fakelogin/',Fakeuser_Login_Create.as_view(),name="fake_login"),
     path('register/',user_view.register,name="register"),
     path('profile/<str:username>/',user_view.profile,name="profile"),
 	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html'), name='login'),

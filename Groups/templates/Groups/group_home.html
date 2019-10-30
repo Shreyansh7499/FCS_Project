@@ -12,11 +12,11 @@
 		<a href="{% url 'group_create' %}">Create Group</a>
 
 		<h1>Groups Owned</h1>
-    	{% for group in groups_owned %}
+    	{% for group in mygroups_admin %}
 			<div>
-				<a href="{% url 'mygroup' group %}">
+				<a href="{% url 'mygroup' group.group_name %}">
 					<h2>
-						{{group}}
+						{{group.group_name}}
 					</h2>
 				</a>
 				<a href="{% url 'group_join_reequest_create' %}"> 

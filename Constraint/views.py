@@ -41,7 +41,6 @@ class Constraint_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
         index_before = ll.index(constraint.user_type)
         index_after = ll.index(form.instance.user_type)
 
-        print(index_before,index_after)
         wallet = Wallet.objects.get(owner = self.request.user)
         if form.instance.user_type == 'casual':
             pass
@@ -49,29 +48,29 @@ class Constraint_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
             if wallet.money >= 50:
                 wallet.money = wallet.money - 50
                 wallet.save()
-                print("silver")
             else:
+                messages.success(request, f'Not enough money')
                 return redirect('Wall-home')
         elif form.instance.user_type == 'gold' and index_after >index_before:
             if wallet.money >= 100:
                 wallet.money = wallet.money -100
                 wallet.save()
-                print("gold")
             else:
+                messages.success(request, f'Not enough money')
                 return redirect('Wall-home')
         elif form.instance.user_type == 'platinum' and index_after >index_before:
             if wallet.money >= 150:
                 wallet.money = wallet.money - 150
                 wallet.save()
-                print("platinum")
             else:
+                messages.success(request, f'Not enough money')
                 return redirect('Wall-home')
         elif index_after >index_before:
             if wallet.money >= 5000 :
                 wallet.money = wallet.money - 5000
                 wallet.save()
-                print("commercial")
             else:
+                messages.success(request, f'Not enough money')
                 return redirect('Wall-home')
         # data = get_friends_matrix(self.request.user)
         # friend = form.instance.receiver
@@ -91,7 +90,6 @@ class Constraint_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
 @login_required
 def update_constraint(request):
     if request.user.is_authenticated:
-        print(request.user.username,request.user.pk)
         user = User.objects.get(pk=request.user.pk)
         try:
             constraint = Constraint.objects.get(owner=request.user)
@@ -103,4 +101,5 @@ def update_constraint(request):
             return redirect('wallet_create')
         return redirect('update_constraint',pk=constraint.pk)
     else:
+        messages.success(request, f'log in first')
         return redirect('login')

@@ -11,6 +11,7 @@ from Messages.views import get_friends_matrix
 from Constraint.models import Constraint
 from Wallet.models import Wallet
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 class Post_Create(LoginRequiredMixin,CreateView):
@@ -25,6 +26,7 @@ class Post_Create(LoginRequiredMixin,CreateView):
         if self.request.user in data['friends'] or self.request.user == form.instance.wall_owner:
             return super().form_valid(form)
         else:
+            messages.success(request, f'Cannot create post')
             return redirect('Wall-home')
 
 
@@ -55,7 +57,7 @@ class Post_Delete(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
         if self.request.user == post.author or self.request.user == post.wall_owner:
             return True
         return False
-    success_url = '/Wall'
+    success_url = '/'
 
 
 
@@ -69,9 +71,9 @@ def home(request):
             wallet = Wallet.objects.get(owner=request.user)
         except Wallet.DoesNotExist:
             return redirect('wallet_create')    
-
         data = {'posts': Post.objects.filter(wall_owner = request.user).order_by('-date_posted')}	
         return render(request, 'Wall/home.html',data)
+    messages.success(request, f'log in first')
     return redirect('login')
 
 
@@ -83,6 +85,8 @@ def friend_wall(request,username):
             posts = {'posts': Post.objects.filter(wall_owner = friend).order_by('-date_posted')}
             return render(request, 'Wall/friend_wall.html',posts)
         else:
+            messages.success(request, f'You are not his/her friend')
             return redirect('Wall-home')
     else:
+        messages.success(request, f'log in first')
         return redirect('login')

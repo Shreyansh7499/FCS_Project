@@ -12,7 +12,7 @@ from django.contrib.auth.models import User
 from django.db.models import Q
 from Constraint.models import Constraint
 from Wallet.models import Wallet
-
+from django.contrib import messages
 
 class Message_Create(LoginRequiredMixin,CreateView):
     model = Message
@@ -41,6 +41,7 @@ def message_view(request):
         for i in data['friends']:
             friends_usernames.append(i.username)
         return render(request, 'Messages/message_view.html',{"friends_usernames":friends_usernames})
+    messages.success(request, f'Login first')
     return redirect('login')
 
 
@@ -53,6 +54,8 @@ def chat(request,username):
             messages = Message.objects.filter(Q(sender=friend,receiver=request.user) | Q(sender=request.user,receiver=friend)).order_by('date_posted')
             return render(request,'Messages/chat.html',{'messages':messages})
         else:
+            messages.success(request, f'You are not his/her friend')
             return redirect('messages_view')
     else:
+        messages.success(request, f'Login first')
         return redirect('login')

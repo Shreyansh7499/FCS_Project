@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from Constraint.models import Constraint
 from Wallet.models import Wallet
-
+from django.contrib import messages
 
 @login_required
 def group_home(request):
@@ -33,9 +33,11 @@ def group_home(request):
         for grp in all_groups:
             if request.user in grp.members.all():
                 my_groups_member_group_name.append(grp.group_name)
+
         groups = Group.objects.filter(user_privacy='public')
-        return render(request, 'Groups/group_home.html',{'groups':groups,'my_groups':groups_owned,'my_groups_members':my_groups_member_group_name})
-    return render(request, 'Groups/group_home.html')
+        return render(request, 'Groups/group_home.html',{'groups':groups,'my_groups':groups_owned,'my_groups_members':my_groups_member_group_name,'mygroups_admin':mygroups_admin})
+    messages.success(request, f'Login first')
+    return redirect('login')
 
 
 class Group_Create(LoginRequiredMixin,CreateView):
@@ -89,7 +91,7 @@ class Group_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
 @login_required
 def mygroup(request,group_name):
     if request.user.is_authenticated:
-        group = Group.objects.filter(group_name=group_name)[0]
+        group = Group.objects.get(group_name=group_name)
         requests = Group_join_request.objects.filter(group=group).exclude(user_requesting=group.owner).order_by('-date_posted')
         members = group.members.all()
         
@@ -101,8 +103,10 @@ def mygroup(request,group_name):
             group_posts = Group_post.objects.filter(group=group).order_by('-date_posted')
             return render(request,'Groups/mygroup.html',{'group_posts':group_posts,'members':members_name,'member_requests':requests,'group_name':group.group_name,'owner_name':group.owner.username})
         else:
+            messages.success(request, f'You are not part of this group')
             return redirect('group_home')
     else:
+        messages.success(request, f'Login first')
         return redirect('login')
 
 
@@ -154,8 +158,18 @@ def add_group_member(request,group_name,pk):
             Group.add_member(group_name,new_member)
             join_request = Group_join_request.objects.get(group=group,user_requesting=new_member)
             join_request.delete()
-        return redirect('group_home')
+            return redirect('group_home')
+        else:
+            if request.user != group.owner:
+                messages.success(request, f'You are not the group admin')
+                return redirect('group_home')
+            elif wallet.money >= group.cost:
+                messages.success(request, f'User cannot pay group joining cost')
+                return redirect('group_home')
+            else:
+                return redirect('group_home')
     else:
+        messages.success(request, f'Login first')
         return redirect('login')
 
 
@@ -168,5 +182,10 @@ def remove_group_member(request,group_name,username):
         
         if request.user == group.owner:
             Group.remove_member(group_name,new_member)    
-        return redirect('group_home')
-    return redirect('login')
+            return redirect('group_home')
+        else:
+            messages.success(request, f'You are not the group admin')
+            return redirect('group_home')
+    else:
+        messages.success(request, f'Login first')
+        return redirect('login')

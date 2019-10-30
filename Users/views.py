@@ -8,6 +8,33 @@ from .models import *
 from Constraint.models import Constraint
 from Wallet.models import Wallet
 from django.contrib.auth import update_session_auth_hash
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
+
+
+# class Fakeuser_Login_Create(LoginRequiredMixin,CreateView):
+#     model = Fakeuser
+#     fields = ['user']
+#     template_name = 'Wallet/create_add_money_transaction.html'
+#     context_object_name = 'fakeuser'
+
+#     def form_valid(self,form):
+
+#         otp = generate_OTP()
+#         try:
+#             otp_object = Fakeuser.objects.get(owner=form.instance.user)
+#         except:
+#             otp_object = Fakeuser.objects.create(owner=form.instance.user)
+#         otp_object.otp = otp
+#         otp_object.save()
+
+#         send_mail(
+#                 subject="Your OTP Password",
+#                 message="Your OTP password is %s" % otp,
+#                 from_email=settings.EMAIL_HOST_USER,
+#                 recipient_list=[form.instance.user.email]
+#             )
 
 
 class RegistrationForm(UserCreationForm):
@@ -28,6 +55,7 @@ def register(request):
             wallet.save()
             constraint = Constraint.objects.create(owner=new_user)
             constraint.save()
+            messages.success(request, f'Login please')
             return redirect('login')
     else:
         form = RegistrationForm()
@@ -38,14 +66,18 @@ def profile(request,username):
     if request.user.is_authenticated:
         user = User.objects.get(username=username)
         constraint = Constraint.objects.get(owner=user)
-        if constraint.user_privacy == 'public':
-            return render(request,'Users/profile.html',{'profile_username':user.username})
+
+        if constraint.user_privacy == 'public' or request.user.username == username:
+            return render(request,'Users/profile.html',{'profile_username':user.username,'profile_email':user.email})
         elif constraint.user_privacy == 'friends':
             data = get_friends_matrix(user)
             if request.user in data['friends']:
-                return render(request,'Users/profile.html',{'profile_username':user.username})
+                return render(request,'Users/profile.html',{'profile_username':user.username,'profile_email':user.email})
+        messages.success(request, f'The profile is private')
         return render(request, 'Wall/home.html')
-    return redirect('login')
+    else:
+        messages.success(request, f'Login first')
+        return redirect('login')
 
 
 @login_required
@@ -53,7 +85,9 @@ def friend_page(request):
     if request.user.is_authenticated:
         data = get_friends_matrix(request.user)
         return render(request, 'Users/friends.html',data)
-    return redirect('login')
+    else:
+        messages.success(request, f'Login first')
+        return redirect('login')
 
 def get_friends_matrix(user):
     user_friends = get_one_sided_friends(user)
@@ -100,6 +134,7 @@ def add_friend(request,pk):
         Friend.add_friend(request.user,new_friend)
         return redirect('friend_page')
     else:
+        messages.success(request, f'Login first')
         return redirect('login')
 
 @login_required
@@ -109,6 +144,7 @@ def remove_friend(request,pk):
         Friend.remove_friend(request.user,new_friend)
         return redirect('friend_page')   
     else:
+        messages.success(request, f'Login first')
         return redirect('login')   
 
     
