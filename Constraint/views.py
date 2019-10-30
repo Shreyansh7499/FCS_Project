@@ -9,6 +9,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from Wallet.models import Wallet
+from django.contrib import messages
 
 class Constraint_Create(LoginRequiredMixin,CreateView):
     model = Constraint
