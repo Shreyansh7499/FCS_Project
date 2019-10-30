@@ -1,0 +1,1 @@
+web: gunicorn FCS_Project.wsgi
