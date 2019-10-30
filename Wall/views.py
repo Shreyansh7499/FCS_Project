@@ -26,7 +26,7 @@ class Post_Create(LoginRequiredMixin,CreateView):
         if self.request.user in data['friends'] or self.request.user == form.instance.wall_owner:
             return super().form_valid(form)
         else:
-            messages.success(request, f'Cannot create post')
+            messages.success(self.request, f'Cannot create post')
             return redirect('Wall-home')
 
 
@@ -89,4 +89,67 @@ def friend_wall(request,username):
             return redirect('Wall-home')
     else:
         messages.success(request, f'log in first')
+        return redirect('login')
+
+
+class Commercial_Post_Create(LoginRequiredMixin,CreateView):
+    model = Commercial_Post
+    fields = ['title','content']
+    template_name = 'Wall/create_post.html'
+    context_object_name = 'posts'
+
+    def form_valid(self,form):
+        form.instance.author = self.request.user
+        constraint =Constraint.objects.get(owner=self.request.user)
+        if constraint.user_type == 'commercial':
+            return super().form_valid(form)
+        else:
+            messages.success(self.request, f'Cannot create commercial post')
+            return redirect('Wall-home')
+
+
+class Commercial_Post_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
+    model = Commercial_Post
+    fields = ['title','content']
+    template_name = 'Wall/create_post.html'
+    context_object_name = 'posts'
+
+    def form_valid(self,form):
+        form.instance.author = self.request.user
+        constraint =Constraint.objects.get(owner=self.request.user)
+        if constraint.user_type == 'commercial':
+            return super().form_valid(form)
+        else:
+            messages.success(self.request, f'Cannot create commercial post')
+            return redirect('Wall-home')
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
+
+
+class Commercial_Post_Delete(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
+    model = Commercial_Post
+
+    def test_func(self):
+        post = self.get_object()
+        if self.request.user == post.author:
+            return True
+        return False
+    success_url = '/'
+
+def commercial_page(request,username):
+    if request.user.is_authenticated:
+        user = User.objects.get(username=username)
+        constraint = Constraint.objects.get(owner=user)
+        if constraint.user_type == 'commercial':
+            data = {'posts': Commercial_Post.objects.filter(author = request.user).order_by('-date_posted')}   
+            return render(request, 'Wall/commercial_page.html',data)
+        else:
+            messages.success(request, f'Not a commercial user')
+        return redirect('Wall-home')
+    else:
+        messages.success(request, f'Not a commercial user')
         return redirect('login')

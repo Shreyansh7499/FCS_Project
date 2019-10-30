@@ -50,28 +50,28 @@ class Constraint_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
                 wallet.money = wallet.money - 50
                 wallet.save()
             else:
-                messages.success(request, f'Not enough money')
+                messages.success(self.request, f'Not enough money')
                 return redirect('Wall-home')
         elif form.instance.user_type == 'gold' and index_after >index_before:
             if wallet.money >= 100:
                 wallet.money = wallet.money -100
                 wallet.save()
             else:
-                messages.success(request, f'Not enough money')
+                messages.success(self.request, f'Not enough money')
                 return redirect('Wall-home')
         elif form.instance.user_type == 'platinum' and index_after >index_before:
             if wallet.money >= 150:
                 wallet.money = wallet.money - 150
                 wallet.save()
             else:
-                messages.success(request, f'Not enough money')
+                messages.success(self.request, f'Not enough money')
                 return redirect('Wall-home')
         elif index_after >index_before:
             if wallet.money >= 5000 :
                 wallet.money = wallet.money - 5000
                 wallet.save()
             else:
-                messages.success(request, f'Not enough money')
+                messages.success(self.request, f'Not enough money')
                 return redirect('Wall-home')
         # data = get_friends_matrix(self.request.user)
         # friend = form.instance.receiver

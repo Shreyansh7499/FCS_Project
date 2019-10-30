@@ -23,8 +23,3 @@ class Friend(models.Model):
 	def remove_friend(cls,current_user,new_friend):
 		friend,created = cls.objects.get_or_create(current_user=current_user)
 		friend.users.remove(new_friend)
-
-
-# class Fakeuser(models.models):
-# 	owner = models.OneToOneField(User,on_delete=models.CASCADE)
-# 	otp = models.IntegerField(default=-1)

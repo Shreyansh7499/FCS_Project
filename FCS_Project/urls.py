@@ -26,7 +26,7 @@ from Messages.views import Message_Create
 from Constraint import views as constraint_view
 from Groups.views import Group_Create,Group_Post_Create,Group_Join_request_Create,Group_Update
 from Wallet.views import Wallet_Create,Transaction_Create,Add_Money_Transaction_Create
-from Wall.views import Post_Create,Post_Update,friend_wall,Post_Delete
+from Wall.views import Post_Create,Post_Update,friend_wall,Post_Delete,Commercial_Post_Create,Commercial_Post_Update,Commercial_Post_Delete
 from Constraint.views import Constraint_Create,Constraint_Update
 # from django_otp.forms import OTPAuthenticationForm
 from Users.forms import OTPAuthentication
@@ -42,12 +42,16 @@ urlpatterns = [
     path('update_constraint/<int:pk>/', Constraint_Update.as_view(), name='update_constraint'),
     path('update_constraint_start/',constraint_view.update_constraint,name='update_constraint_start'),
     
-
+commercial_page
     
     path('', post_view.home, name='Wall-home'),
+    path('commercial_page/<str:username>/', post_view.commercial_page, name='commercial_page'),
     path('create_post', Post_Create.as_view(), name='Wall-create-post'),
     path('update_post/<int:pk>/', Post_Update.as_view(), name='Wall-update-post'),
     path('delete_post/<int:pk>/', Post_Delete.as_view(success_url=reverse_lazy('Wall-home')), name='delete_post'),
+    path('create_commercial_post', Commercial_Post_Create.as_view(), name='Wall-create-commercial-post'),
+    path('update_commercial_post/<int:pk>/', Commercial_Post_Update.as_view(), name='Wall-update-commercial-post'),
+    path('delete_commercial_post/<int:pk>/', Commercial_Post_Delete.as_view(success_url=reverse_lazy('Wall-home')), name='delete_commercial_post'),
     path('friend_wall/<str:username>/',post_view.friend_wall, name = 'friend_wall'),
     path('messages/', messages_view.message_view, name='messages_view'),
     path('create_message/', Message_Create.as_view(), name='message_create'),

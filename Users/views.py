@@ -17,32 +17,6 @@ from django.contrib.auth import views as auth_views
 from functools import partial
 from django.contrib.auth import login,authenticate
 
-
-# class Fakeuser_Login_Create(LoginRequiredMixin,CreateView):
-#     model = Fakeuser
-#     fields = ['user']
-#     template_name = 'Wallet/create_add_money_transaction.html'
-#     context_object_name = 'fakeuser'
-
-#     def form_valid(self,form):
-
-#         otp = generate_OTP()
-#         try:
-#             otp_object = Fakeuser.objects.get(owner=form.instance.user)
-#         except:
-#             otp_object = Fakeuser.objects.create(owner=form.instance.user)
-#         otp_object.otp = otp
-#         otp_object.save()
-
-#         send_mail(
-#                 subject="Your OTP Password",
-#                 message="Your OTP password is %s" % otp,
-#                 from_email=settings.EMAIL_HOST_USER,
-#                 recipient_list=[form.instance.user.email]
-#             )
-
-
-
 class SimpleOTPRegistrationForm(OTPTokenForm):
     otp_device = forms.CharField(required=False, widget=forms.HiddenInput)
     otp_challenge = forms.CharField(required=False, widget=forms.HiddenInput)
