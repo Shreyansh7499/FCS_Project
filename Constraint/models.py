@@ -6,7 +6,7 @@ from model_utils import Choices
 
 
 class Constraint(models.Model):
-    owner = models.ForeignKey(User,related_name="owner_constraint",on_delete=models.CASCADE,unique=True)
+    owner = models.ForeignKey(User,related_name="owner_constraint",on_delete=models.CASCADE)
 
     user_choices = Choices('casual', 'silver','gold','platinum','commercial')
     privacy_choices = Choices('private','public','friends')

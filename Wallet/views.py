@@ -14,6 +14,10 @@ import hashlib
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
+from django.utils import timezone
+from django.db.models import Q
+
+
 
 def get_hash(string):
     hash_value = hashlib.sha256(string.encode()) 
@@ -74,6 +78,7 @@ def create_transcation_start(request):
         except:
             otp_object = OTP.objects.create(owner=request.user)
         otp_object.otp = otp
+        otp_object.date_posted = timezone.now()
         otp_object.save()
         send_mail(
                 subject="Your OTP Password",
@@ -95,9 +100,12 @@ class Transaction_Create(LoginRequiredMixin,CreateView):
     def form_valid(self,form):
         otp_object = OTP.objects.get(owner=self.request.user)
         
-        if form.instance.otp != otp_object.otp or otp_object.otp ==-1:
+        if form.instance.otp != otp_object.otp or otp_object.otp == -1:
+            messages.success(request, f'OTP is incorrect or expired')
             return redirect('Wall-home')
-
+        if (timezone.now()-otp_object.date_posted).total_seconds() > 300:
+            messages.success(request, f'OTP is expired')
+            return redirect('Wall-home')
         otp_object.otp = -1
         otp_object.save()
 
@@ -187,3 +195,12 @@ class Add_Money_Transaction_Create(LoginRequiredMixin,CreateView):
         	return super().form_valid(form)
         else:
         	return redirect('wallet_home')
+
+@login_required
+def view_transaction_logs(request):
+	if request.user.is_authenticated:
+		logs = Transaction_Log.objects.filter(Q(sender=request.user) | Q(receiver=request.user))
+		return render(request, 'Wallet/view_transaction_logs.html',{'logs':logs})
+	else:
+		messages.success(request, f'log in first')
+		return redirect('login')

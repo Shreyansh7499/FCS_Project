@@ -41,6 +41,7 @@ class Transaction(models.Model):
 class OTP(models.Model):
 	owner = models.ForeignKey(User,related_name='otp_owner',on_delete=models.CASCADE)
 	otp = models.IntegerField(default=-1)
+	date_posted = models.DateTimeField(default=timezone.now)
 
 class Add_Money_Transaction(models.Model):
 	sender = models.ForeignKey(User,related_name='add_money_transaction_sender',on_delete=models.CASCADE)

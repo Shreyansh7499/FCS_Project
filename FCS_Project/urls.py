@@ -33,7 +33,7 @@ from Users import forms as user_forms
 from django.conf.urls import url
 # from Users.views import Fakeuser_Login_Create
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('bleh_admin/', admin.site.urls),
 
     
     path('create_constraint', Constraint_Create.as_view(), name='create_constraint'),
@@ -66,6 +66,7 @@ urlpatterns = [
     path('create_transaction_start/', wallet_view.create_transcation_start, name='transaction_create_start'),
     path('create_add_money_transaction/', Add_Money_Transaction_Create.as_view(), name='add_money_transaction_create'),
     path('accept_transaction/<int:pk>/', wallet_view.accept_transaction, name='accept_transaction'),
+    path('view_transaction_logs/', wallet_view.view_transaction_logs, name='view_transaction_logs'),
 
     # path('fakelogin/',Fakeuser_Login_Create.as_view(),name="fake_login"),
     path('register/',user_view.register,name="register"),
