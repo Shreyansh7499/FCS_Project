@@ -11,6 +11,11 @@ from django.contrib.auth import update_session_auth_hash
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
+from django_otp.plugins.otp_totp.models import TOTPDevice
+from django_otp.forms import OTPTokenForm
+from django.contrib.auth import views as auth_views
+from functools import partial
+from django.contrib.auth import login,authenticate
 
 
 # class Fakeuser_Login_Create(LoginRequiredMixin,CreateView):
@@ -37,9 +42,21 @@ from django.contrib import messages
 #             )
 
 
+
+class SimpleOTPRegistrationForm(OTPTokenForm):
+    otp_device = forms.CharField(required=False, widget=forms.HiddenInput)
+    otp_challenge = forms.CharField(required=False, widget=forms.HiddenInput)
+    otp_token = forms.CharField(required=False,max_length=6)
+
+def otp_show(request):
+    form = partial(SimpleOTPRegistrationForm,request.user)
+    totp = TOTPDevice.objects.get(user_id=request.user.id)
+    link = totp.config_url
+    full_link = "https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl="+str(link)  
+    return auth_views.LoginView.as_view(template_name='Users/otp_reg.html',authentication_form=form,extra_context={'qr':str(full_link)})(request)
+
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField()
-    
     class Meta:
         model = User
         fields = ['username', 'email', 'password1', 'password2']
@@ -48,15 +65,19 @@ def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            form.save()
-            print(form.instance.username,"username")
+            new_user = form.save()
+            totp = TOTPDevice()
+            totp.user = new_user
+            totp.save()
             new_user = User.objects.get(username = form.instance.username)
             wallet = Wallet.objects.create(owner=new_user)
             wallet.save()
             constraint = Constraint.objects.create(owner=new_user)
             constraint.save()
+            user=authenticate(username=new_user.username,password=form.cleaned_data['password1'])
+            login(request,user)
             messages.success(request, f'Login please')
-            return redirect('login')
+            return redirect('otp-reg')
     else:
         form = RegistrationForm()
     return render(request, 'Users/register.html', {'form': form})

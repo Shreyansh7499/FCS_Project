@@ -28,10 +28,12 @@ from Groups.views import Group_Create,Group_Post_Create,Group_Join_request_Creat
 from Wallet.views import Wallet_Create,Transaction_Create,Add_Money_Transaction_Create
 from Wall.views import Post_Create,Post_Update,friend_wall,Post_Delete
 from Constraint.views import Constraint_Create,Constraint_Update
-from django_otp.forms import OTPAuthenticationForm
-from Users import forms as user_forms
+# from django_otp.forms import OTPAuthenticationForm
+from Users.forms import OTPAuthentication
 from django.conf.urls import url
-# from Users.views import Fakeuser_Login_Create
+from Users.views import SimpleOTPRegistrationForm
+
+
 urlpatterns = [
     path('bleh_admin/', admin.site.urls),
 
@@ -71,7 +73,8 @@ urlpatterns = [
     # path('fakelogin/',Fakeuser_Login_Create.as_view(),name="fake_login"),
     path('register/',user_view.register,name="register"),
     path('profile/<str:username>/',user_view.profile,name="profile"),
-	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html'), name='login'),
+	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html',authentication_form=OTPAuthentication), name='login'),
+    path('otpreg/', user_view.otp_show, name='otp-reg'),
 	path('logout/', auth_view.LogoutView.as_view(template_name='Users/logout.html'), name='logout'),
     path('change_password/', auth_view.PasswordChangeView.as_view(success_url=reverse_lazy('change_password_done'),template_name='Users/change_password.html'), name='change_password'),
     path('change_password_done/', auth_view.PasswordChangeDoneView.as_view(template_name='Users/change_password_done.html'), name='change_password_done'),

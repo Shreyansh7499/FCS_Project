@@ -4,35 +4,16 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.mail import send_mail
 from datetime import date,datetime
 import hashlib
-
+from django_otp.forms import OTPAuthenticationForm
 
 def get_hash(string):
     hash_value = hashlib.sha256(string.encode()) 
     return hash_value.hexdigest()
 
-class OTPAuthenticationForm(AuthenticationForm):
-    otp = forms.CharField(required=False, widget=forms.PasswordInput)
-
-    def clean(self):
-        super(OTPAuthenticationForm, self).clean()
-        if otp != '1234':
-            raise forms.ValidationError("Enter OTP you received via e-mail")
-
-        if self.request.session.has_key('_otp'):
-            if self.request.session['_otp'] != self.cleaned_data['otp']:
-                raise forms.ValidationError("Invalid OTP.")
-            del self.request.session['_otp']
-        else:
-            otp = '1234'
-            print(otp)
-            send_mail(
-                subject="Your OTP Password",
-                message="Your OTP password is %s" % otp,
-                from_email=settings.EMAIL_HOST_USER,
-                recipient_list=[self.user_cache.email]
-            )
-            self.request.session['_otp'] = otp
-            raise forms.ValidationError("Enter OTP you received via e-mail")
+class OTPAuthentication(OTPAuthenticationForm):
+    otp_device = forms.CharField(required=False, widget=forms.HiddenInput)
+    otp_challenge = forms.CharField(required=False, widget=forms.HiddenInput)
+    otp_token = forms.CharField(required=False,max_length=6)  
 
 def F(hash_value):
     last_char = hash_value[-1]

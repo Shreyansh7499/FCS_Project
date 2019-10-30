@@ -12,7 +12,7 @@ class Message(models.Model):
     receiver = models.ForeignKey(User,related_name='receiver',on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.message +" by: " + self.sender.username + ". from:" + self.receiver.username)
+        return str(self.message +" sender: " + self.sender.username + ". receiver:" + self.receiver.username)
 
     def get_absolute_url(self):
         return reverse('messages_view')

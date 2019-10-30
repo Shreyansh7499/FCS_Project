@@ -36,11 +36,18 @@ class Message_Create(LoginRequiredMixin,CreateView):
 
 def message_view(request):
     if request.user.is_authenticated:
+        constraints = Constraint.objects.filter(user_type='commercial')
+        all_messages = []
+        for constraint in constraints:
+            messages = Message.objects.filter(sender=constraint.owner,receiver=request.user)
+            if messages:
+                all_messages.append(messages)
+        print(all_messages)
         data = get_friends_matrix(request.user)
         friends_usernames = []
         for i in data['friends']:
             friends_usernames.append(i.username)
-        return render(request, 'Messages/message_view.html',{"friends_usernames":friends_usernames})
+        return render(request, 'Messages/message_view.html',{"friends_usernames":friends_usernames,'ads':all_messages})
     messages.success(request, f'Login first')
     return redirect('login')
 

@@ -14,6 +14,15 @@
     	<a href="{% url 'message_create' %}"> 
 			<button type="button" class="btn btn-primary">Send Message</button>
 		</a>
+		<h1>Message from Commercial Users</h1>
+		{% for messages in ads %}
+			{% for message in messages %}
+				<h2>SENDER: {{message.sender.username}}</h2>
+				<h3>MESSAGE: {{message.message}}</h3>
+				<br>
+				<br>
+			{% endfor%}
+		{% endfor%}
     	{% for name in friends_usernames %}
 			<div>
 				<a href="{% url 'profile' name %}">
