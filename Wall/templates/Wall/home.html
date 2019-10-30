@@ -12,6 +12,7 @@
 		<a href="{% url 'change_password' %}">Change Password</a>
 		<a href="{% url 'Wall-create-post' %}">Create Post</a>
 		<a href="{% url 'Wall-create-commercial-post' %}">Create Commercial Post</a>
+		<a href="{% url 'commercial_page' username=user.username %}">My Commercial Page</a>
     	{% for post in posts %}
 			<div>
 				<h1>{{post.author}}</h1>

@@ -120,7 +120,7 @@ class Commercial_Post_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
         if constraint.user_type == 'commercial':
             return super().form_valid(form)
         else:
-            messages.success(self.request, f'Cannot create commercial post')
+            messages.success(self.request, f'Cannot update commercial post')
             return redirect('Wall-home')
 
     def test_func(self):

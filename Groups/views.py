@@ -50,6 +50,7 @@ class Group_Create(LoginRequiredMixin,CreateView):
         form.instance.owner = self.request.user
         constraint = Constraint.objects.get(owner = self.request.user)
         if constraint.user_type == 'casual':
+            messages.success(self.request, f'Casual user cannot make groups')
             return redirect('group_home')
         if constraint.user_type == 'silver':
             if constraint.number_of_groups < 2:
@@ -57,6 +58,7 @@ class Group_Create(LoginRequiredMixin,CreateView):
                 constraint.save()
                 return super().form_valid(form)
             else:
+                messages.success(self.request, f'Group Limit has exceeded')
                 return redirect('group_home') 
         if constraint.user_type == 'gold':
             if constraint.number_of_groups < 4:
@@ -64,6 +66,7 @@ class Group_Create(LoginRequiredMixin,CreateView):
                 constraint.save()
                 return super().form_valid(form)
             else:
+                messages.success(self.request, f'Group limit has exceeded')
                 return redirect('group_home')
         else:
             constraint.number_of_groups+=1

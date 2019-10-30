@@ -101,10 +101,10 @@ class Transaction_Create(LoginRequiredMixin,CreateView):
         otp_object = OTP.objects.get(owner=self.request.user)
         
         if form.instance.otp != otp_object.otp or otp_object.otp == -1:
-            messages.success(request, f'OTP is incorrect or expired')
+            messages.success(self.request, f'OTP is incorrect or expired')
             return redirect('Wall-home')
         if (timezone.now()-otp_object.date_posted).total_seconds() > 300:
-            messages.success(request, f'OTP is expired')
+            messages.success(self.request, f'OTP is expired')
             return redirect('Wall-home')
         otp_object.otp = -1
         otp_object.save()
@@ -132,10 +132,10 @@ class Transaction_Create(LoginRequiredMixin,CreateView):
                 return super().form_valid(form)
             else:
                 if int(form.instance.amount) < 0:
-                    messages.success(request, f'Amount should be greater than 0')
+                    messages.success(self.request, f'Amount should be greater than 0')
                     return redirect('wallet_home')
                 elif Wallet.objects.get(owner = self.request.user).money >= int(total_pending):
-                    messages.success(request, f'the sum of your pending transactions is greater than your account balance')
+                    messages.success(self.request, f'the sum of your pending transactions is greater than your account balance')
                     return redirect('wallet_home')
                 return redirect('wallet_home')
         else:
@@ -145,13 +145,13 @@ class Transaction_Create(LoginRequiredMixin,CreateView):
                 return super().form_valid(form)
             else:
                 if int(form.instance.amount) < 0:
-                    messages.success(request, f'Amount should be greater than 0')
+                    messages.success(self.request, f'Amount should be greater than 0')
                     return redirect('wallet_home')
                 elif Wallet.objects.get(owner = self.request.user).money >= int(total_pending):
-                    messages.success(request, f'the sum of your pending transactions is greater than your account balance')
+                    messages.success(self.request, f'the sum of your pending transactions is greater than your account balance')
                     return redirect('wallet_home')
                 elif max_transaction < constraint.number_of_transactions:
-                    messages.success(request, f'You have exceeded your transaction limit')
+                    messages.success(self.request, f'You have exceeded your transaction limit')
                     return redirect('wallet_home')
                 return redirect('wallet_home')
 
