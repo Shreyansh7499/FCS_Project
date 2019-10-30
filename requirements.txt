@@ -13,3 +13,4 @@ requests==2.19.1
 urllib3==1.23
 python-dateutil==2.8.0
 DateTime==4.3
+django-secure==1.0.1
