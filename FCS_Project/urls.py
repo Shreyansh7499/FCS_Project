@@ -42,7 +42,6 @@ urlpatterns = [
     path('update_constraint/<int:pk>/', Constraint_Update.as_view(), name='update_constraint'),
     path('update_constraint_start/',constraint_view.update_constraint,name='update_constraint_start'),
     
-commercial_page
     
     path('', post_view.home, name='Wall-home'),
     path('commercial_page/<str:username>/', post_view.commercial_page, name='commercial_page'),
