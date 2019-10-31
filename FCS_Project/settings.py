@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '5fcpx5s)_0=f^+zl)x*x_gi(%1^7s9ap-n%ja$1-leu3vumzkt'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['fcs-project1234.herokuapp.com']
 
@@ -59,8 +59,8 @@ MIDDLEWARE = [
 ]
 
 SECURE_SSL_REDIRECT =False
-SECURE_HSTS_SECONDS = 15
-SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+# SECURE_HSTS_SECONDS = 15
+# SECURE_HSTS_INCLUDE_SUBDOMAINS = False
 SECURE_FRAME_DENY = False
 SECURE_CONTENT_TYPE_NOSNIFF =False
 SECURE_BROWSER_XSS_FILTER = False
