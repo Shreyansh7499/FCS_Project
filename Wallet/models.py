@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Wallet(models.Model):
@@ -23,7 +24,7 @@ class Wallet(models.Model):
 class Transaction(models.Model):
 	sender = models.ForeignKey(User,related_name='transaction_sender',on_delete=models.CASCADE)
 	receiver = models.ForeignKey(User,related_name='transaction_receiver',on_delete=models.CASCADE)
-	amount = models.IntegerField(default = 0)
+	amount = models.IntegerField(default = 0,validators=[MaxValueValidator(20000),MinValueValidator(0)])
 	date_posted = models.DateTimeField(default=timezone.now)
 	otp = models.IntegerField(default=-1)
 	
@@ -45,7 +46,7 @@ class OTP(models.Model):
 
 class Add_Money_Transaction(models.Model):
 	sender = models.ForeignKey(User,related_name='add_money_transaction_sender',on_delete=models.CASCADE)
-	amount = models.IntegerField(default = 0)
+	amount = models.IntegerField(default = 0,validators=[MaxValueValidator(20000),MinValueValidator(0)])
 	date_posted = models.DateTimeField(default=timezone.now)
 
 	def __str__(self):
