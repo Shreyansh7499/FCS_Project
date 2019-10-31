@@ -58,15 +58,17 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-SECURE_SSL_REDIRECT =True
+SECURE_SSL_REDIRECT =False
 SECURE_HSTS_SECONDS = 15
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_FRAME_DENY = True
-SECURE_CONTENT_TYPE_NOSNIFF =True
-SECURE_BROWSER_XSS_FILTER = True
-SESSION_COOKIE_SECURE =True
-SESSION_COOKIE_HTTPONLY = True
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_FRAME_DENY = False
+SECURE_CONTENT_TYPE_NOSNIFF =False
+SECURE_BROWSER_XSS_FILTER = False
+SESSION_COOKIE_SECURE =False
+SESSION_COOKIE_HTTPONLY = False
 ROOT_URLCONF = 'FCS_Project.urls'
+CSRF_COOKIE_SECURE = False
+
 
 TEMPLATES = [
     {
@@ -133,7 +135,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
-STATIC_ROOT= os.path.join(BASE_DIR,'static')
+# STATIC_ROOT= os.path.join(BASE_DIR,'static')
 STATIC_URL = '/static/'
 
 LOGIN_REDIRECT_URL = 'Wall-home'
