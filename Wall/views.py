@@ -62,7 +62,7 @@ class Post_Delete(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
 
 
 def home(request):
-    if request.user.is_verified:
+    if request.user.is_authenticated:
         try:
             constraint = Constraint.objects.get(owner=request.user)
         except Constraint.DoesNotExist:
@@ -78,7 +78,7 @@ def home(request):
 
 
 def friend_wall(request,username):
-    if request.user.is_verified:
+    if request.user.is_authenticated:
         friend = User.objects.get(username=username)
         data = get_friends_matrix(friend)
         if request.user in data['friends']:
@@ -141,7 +141,7 @@ class Commercial_Post_Delete(LoginRequiredMixin,UserPassesTestMixin,DeleteView):
     success_url = '/'
 
 def commercial_page(request,username):
-    if request.user.is_verified:
+    if request.user.is_authenticated:
         user = User.objects.get(username=username)
         constraint = Constraint.objects.get(owner=user)
         if constraint.user_type == 'commercial':

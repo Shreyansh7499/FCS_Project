@@ -76,7 +76,7 @@ urlpatterns = [
     # path('fakelogin/',Fakeuser_Login_Create.as_view(),name="fake_login"),
     path('register/',user_view.register,name="register"),
     path('profile/<str:username>/',user_view.profile,name="profile"),
-	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html',authentication_form=OTPAuthentication), name='login'),
+	path('login/', auth_view.LoginView.as_view(template_name='Users/login.html'), name='login'),
     path('otpreg/', user_view.otp_show, name='otp-reg'),
 	path('logout/', auth_view.LogoutView.as_view(template_name='Users/logout.html'), name='logout'),
     path('change_password/', auth_view.PasswordChangeView.as_view(success_url=reverse_lazy('change_password_done'),template_name='Users/change_password.html'), name='change_password'),

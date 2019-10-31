@@ -40,9 +40,6 @@ def register(request):
         form = RegistrationForm(request.POST)
         if form.is_valid():
             new_user = form.save()
-            totp = TOTPDevice()
-            totp.user = new_user
-            totp.save()
             new_user = User.objects.get(username = form.instance.username)
             wallet = Wallet.objects.create(owner=new_user)
             wallet.save()
@@ -51,14 +48,14 @@ def register(request):
             user=authenticate(username=new_user.username,password=form.cleaned_data['password1'])
             login(request,user)
             messages.success(request, f'Login please')
-            return redirect('otp-reg')
+            return redirect('Wall-home')
     else:
         form = RegistrationForm()
     return render(request, 'Users/register.html', {'form': form})
 
 @login_required
 def profile(request,username):
-    if request.user.is_verified:
+    if request.user.is_authenticated:
         user = User.objects.get(username=username)
         constraint = Constraint.objects.get(owner=user)
 
@@ -77,7 +74,7 @@ def profile(request,username):
 
 @login_required
 def friend_page(request):
-    if request.user.is_verified:
+    if request.user.is_authenticated:
         data = get_friends_matrix(request.user)
         return render(request, 'Users/friends.html',data)
     else:
@@ -124,7 +121,7 @@ def get_usernames(users):
 
 @login_required
 def add_friend(request,pk):
-    if request.user.is_verified:
+    if request.user.is_authenticated:
         new_friend = User.objects.get(pk=pk)
         Friend.add_friend(request.user,new_friend)
         return redirect('friend_page')
@@ -134,7 +131,7 @@ def add_friend(request,pk):
 
 @login_required
 def remove_friend(request,pk):
-    if request.user.is_verified:
+    if request.user.is_authenticated:
         new_friend = User.objects.get(pk=pk)
         Friend.remove_friend(request.user,new_friend)
         return redirect('friend_page')   
