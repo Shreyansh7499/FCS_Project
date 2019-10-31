@@ -58,7 +58,7 @@ def register(request):
 
 @login_required
 def profile(request,username):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         user = User.objects.get(username=username)
         constraint = Constraint.objects.get(owner=user)
 
@@ -77,7 +77,7 @@ def profile(request,username):
 
 @login_required
 def friend_page(request):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         data = get_friends_matrix(request.user)
         return render(request, 'Users/friends.html',data)
     else:
@@ -124,7 +124,7 @@ def get_usernames(users):
 
 @login_required
 def add_friend(request,pk):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         new_friend = User.objects.get(pk=pk)
         Friend.add_friend(request.user,new_friend)
         return redirect('friend_page')
@@ -134,7 +134,7 @@ def add_friend(request,pk):
 
 @login_required
 def remove_friend(request,pk):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         new_friend = User.objects.get(pk=pk)
         Friend.remove_friend(request.user,new_friend)
         return redirect('friend_page')   

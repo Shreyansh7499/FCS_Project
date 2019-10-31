@@ -14,7 +14,7 @@ from django.contrib import messages
 
 @login_required
 def group_home(request):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         try:
             constraint = Constraint.objects.get(owner=request.user)
         except Constraint.DoesNotExist:
@@ -93,7 +93,7 @@ class Group_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
 
 @login_required
 def mygroup(request,group_name):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         group = Group.objects.get(group_name=group_name)
         requests = Group_join_request.objects.filter(group=group).exclude(user_requesting=group.owner).order_by('-date_posted')
         members = group.members.all()
@@ -146,7 +146,7 @@ class Group_Join_request_Create(LoginRequiredMixin,CreateView):
 
 @login_required
 def add_group_member(request,group_name,pk):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         group = Group.objects.get(group_name = group_name)
         new_member = User.objects.get(pk=pk)
         wallet = Wallet.objects.get(owner=new_member)
@@ -178,7 +178,7 @@ def add_group_member(request,group_name,pk):
 
 @login_required
 def remove_group_member(request,group_name,username):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         group = Group.objects.get(group_name = group_name)
 
         new_member = User.objects.get(username=username)

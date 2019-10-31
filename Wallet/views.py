@@ -40,7 +40,7 @@ def generate_OTP():
 
 @login_required
 def wallet_home(request):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         try:
             constraint = Constraint.objects.get(owner=request.user)
         except Constraint.DoesNotExist:
@@ -71,7 +71,7 @@ class Wallet_Create(LoginRequiredMixin,CreateView):
 
 
 def create_transcation_start(request):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         otp = generate_OTP()
         try:
             otp_object = OTP.objects.get(owner=request.user)
@@ -157,7 +157,7 @@ class Transaction_Create(LoginRequiredMixin,CreateView):
 
 
 def accept_transaction(request,pk):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         transaction = Transaction.objects.get(pk=pk)
         wallet_sender = Wallet.objects.get(owner=transaction.sender)
         wallet_receiver = Wallet.objects.get(owner=transaction.receiver)	
@@ -198,7 +198,7 @@ class Add_Money_Transaction_Create(LoginRequiredMixin,CreateView):
 
 @login_required
 def view_transaction_logs(request):
-	if request.user.is_authenticated:
+	if request.user.is_verified:
 		logs = Transaction_Log.objects.filter(Q(sender=request.user) | Q(receiver=request.user))
 		return render(request, 'Wallet/view_transaction_logs.html',{'logs':logs})
 	else:

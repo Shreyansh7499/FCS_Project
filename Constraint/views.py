@@ -90,7 +90,7 @@ class Constraint_Update(LoginRequiredMixin,UserPassesTestMixin,UpdateView):
 
 @login_required
 def update_constraint(request):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         user = User.objects.get(pk=request.user.pk)
         try:
             constraint = Constraint.objects.get(owner=request.user)

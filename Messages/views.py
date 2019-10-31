@@ -35,7 +35,7 @@ class Message_Create(LoginRequiredMixin,CreateView):
 
 
 def message_view(request):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         constraints = Constraint.objects.filter(user_type='commercial')
         all_messages = []
         for constraint in constraints:
@@ -54,7 +54,7 @@ def message_view(request):
 
 @login_required
 def chat(request,username):
-    if request.user.is_authenticated:
+    if request.user.is_verified:
         friend = User.objects.get(username = username)
         data = get_friends_matrix(request.user)
         if friend in data['friends']:
